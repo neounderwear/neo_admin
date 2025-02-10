@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:neo_admin/app/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+  static const routeName = '/login';
   const LoginScreen({super.key});
 
   @override
@@ -143,7 +145,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: size.height * 0.05,
                       child: ElevatedButton(
-                        onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           elevation: 4.0,
                           backgroundColor: Colors.orange,
@@ -154,10 +155,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         child: const Text(
-                          'Login',
+                          'Masuk',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16.0),
                         ),
+                        onPressed: () {
+                          Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                  builder: (context) => MainScreen(
+                                      name: emailController.text.trim())));
+                        },
                       ),
                     ),
                     SizedBox(height: size.height * 0.05),
