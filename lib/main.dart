@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neo_admin/app/main_screen.dart';
 import 'package:neo_admin/constant/theme.dart';
-import 'package:neo_admin/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
 import 'package:neo_admin/features/login/presentation/login_screen.dart';
 
 void main() {
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme(context),
       home: const LoginScreen(),
-      initialRoute: '/login',
+      initialRoute: '/main',
       routes: {
         '/login': (context) => const LoginScreen(),
         '/main': (context) => const MainScreen(name: 'Herlan'),
