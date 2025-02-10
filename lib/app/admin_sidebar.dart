@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AdminSidebar extends StatelessWidget {
   final String name;
@@ -56,12 +57,12 @@ class AdminSidebar extends StatelessWidget {
                 return ListTile(
                   leading: Icon(
                     item['icon'],
-                    color: isSelected ? Colors.orange : Colors.black54,
+                    color: isSelected ? Colors.brown[600] : Colors.black45,
                   ),
                   title: Text(
                     item['title'],
                     style: TextStyle(
-                      color: isSelected ? Colors.orange : Colors.black87,
+                      color: isSelected ? Colors.brown[600] : Colors.black45,
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -76,13 +77,7 @@ class AdminSidebar extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                elevation: 4.0,
-                backgroundColor: Colors.orange,
-                foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 40.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
               ),
               child: const Text(
                 'Keluar',
@@ -107,9 +102,7 @@ class AdminSidebar extends StatelessWidget {
                             'Keluar',
                             style: TextStyle(color: Colors.red),
                           ),
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/login');
-                          },
+                          onPressed: () => context.go('/login'),
                         ),
                       ],
                     );

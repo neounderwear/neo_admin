@@ -16,7 +16,7 @@ class DataCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SpinKitThreeBounce(
-              color: Colors.orange,
+              color: Colors.brown,
               size: 20.0,
             ),
             SizedBox(height: 8.0),
