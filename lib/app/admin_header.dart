@@ -43,30 +43,31 @@ class _AdminHeaderState extends State<AdminHeader> {
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             'Admin Neo',
             style: TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(
-            width: 700,
-            child: TextField(
-              controller: searchController,
-              focusNode: searchFocusNode,
-              autofocus: false,
-              decoration: const InputDecoration(
-                hintText: 'Cari apa...',
-                border: InputBorder.none,
-              ),
-              style: const TextStyle(color: Colors.black),
-            ),
-          ),
-          const CircleAvatar(),
+
+          // SizedBox(
+          //   width: 700,
+          //   child: TextField(
+          //     controller: searchController,
+          //     focusNode: searchFocusNode,
+          //     autofocus: false,
+          //     decoration: const InputDecoration(
+          //       hintText: 'Cari apa...',
+          //       border: InputBorder.none,
+          //     ),
+          //     style: const TextStyle(color: Colors.black),
+          //   ),
+          // ),
+          CircleAvatar(),
         ],
       ),
     );

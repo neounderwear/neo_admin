@@ -3,8 +3,8 @@ import 'package:neo_admin/features/banner/presentation/banner_screen.dart';
 import 'package:neo_admin/features/brand/presentation/brand_screen.dart';
 import 'package:neo_admin/features/category/presentation/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
-import 'package:neo_admin/features/dashboard/presentation/dashboard_screen.dart';
-import 'package:neo_admin/features/media/presentation/media_screen.dart';
+import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
+import 'package:neo_admin/features/media/presentation/ui/media_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
 import 'package:neo_admin/features/product/presentation/product_screen.dart';
 import 'admin_header.dart';
@@ -24,7 +24,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   final List<Widget> _pages = [
     const DashboardScreen(),
