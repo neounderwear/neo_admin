@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         builder: (context, state) => const MediaScreen(),
       ),
     ],
-    initialLocation: '/main',
+    initialLocation: '/login',
     debugLogDiagnostics: true,
     routerNeglect: true,
   );
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Admin Neo',
+      title: 'Admin | GPD',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme(context),
       routeInformationParser: router.routeInformationParser,

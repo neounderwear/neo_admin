@@ -47,7 +47,7 @@ class _AdminHeaderState extends State<AdminHeader> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Admin Neo',
+            'Admin Gudang Pakaian Dalam',
             style: TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.w600,
