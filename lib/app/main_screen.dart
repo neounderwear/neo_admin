@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:neo_admin/features/banner/presentation/banner_screen.dart';
-import 'package:neo_admin/features/brand/presentation/brand_screen.dart';
-import 'package:neo_admin/features/category/presentation/category_screen.dart';
+import 'package:neo_admin/features/banner/presentation/ui/banner_screen.dart';
+import 'package:neo_admin/features/brand/presentation/ui/brand_screen.dart';
+import 'package:neo_admin/features/category/presentation/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
 import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
-import 'package:neo_admin/features/media/presentation/ui/media_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
-import 'package:neo_admin/features/product/presentation/product_screen.dart';
+import 'package:neo_admin/features/product/presentation/ui/product_screen.dart';
 import 'admin_header.dart';
 import 'admin_sidebar.dart';
 
 class MainScreen extends StatefulWidget {
-  static const routeName = '/main';
-
   final String name;
   const MainScreen({
     super.key,
@@ -28,7 +25,6 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     const DashboardScreen(),
-    const MediaScreen(),
     const BannerScreen(),
     const CategoryScreen(),
     const BrandScreen(),

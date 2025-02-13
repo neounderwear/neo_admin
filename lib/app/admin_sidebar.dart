@@ -15,7 +15,6 @@ class AdminSidebar extends StatelessWidget {
 
   final List<Map<String, dynamic>> menuItems = const [
     {'title': 'Beranda', 'icon': Icons.dashboard_rounded},
-    {'title': 'Media', 'icon': Icons.perm_media_rounded},
     {'title': 'Banner', 'icon': Icons.image_rounded},
     {'title': 'Kategori', 'icon': Icons.category_rounded},
     {'title': 'Merek', 'icon': Icons.branding_watermark_rounded},
@@ -114,7 +113,7 @@ class AdminSidebar extends StatelessWidget {
           const SizedBox(height: 10),
           const Center(
             child: Text(
-              'Admin Neo versi 1.0.0',
+              'Admin Gudang Pakaian Dalam v1.0.0',
               style: TextStyle(color: Colors.grey, fontSize: 12.0),
             ),
           ),
