@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class LoginWeb extends StatefulWidget {
-  const LoginWeb({super.key});
+  final Function function;
+  const LoginWeb({
+    super.key,
+    required this.function,
+  });
 
   @override
   State<LoginWeb> createState() => _LoginWebState();
@@ -155,7 +159,9 @@ class _LoginWebState extends State<LoginWeb> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16.0),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          widget.function();
+                        },
                       ),
                     ),
                     SizedBox(height: size.height * 0.05),

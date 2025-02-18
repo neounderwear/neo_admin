@@ -6,7 +6,7 @@ import 'package:neo_admin/features/banner/presentation/ui/banner_screen.dart';
 import 'package:neo_admin/features/brand/presentation/ui/brand_screen.dart';
 import 'package:neo_admin/features/category/presentation/ui/category_screen.dart';
 import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
-import 'package:neo_admin/features/login/presentation/login_screen.dart';
+import 'package:neo_admin/features/login/main/login_screen.dart';
 import 'package:neo_admin/features/product/presentation/ui/add_product_screen.dart';
 import 'package:neo_admin/features/product/presentation/ui/product_screen.dart';
 
@@ -33,7 +33,7 @@ class _MyAppState extends State<MyApp> {
 
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: '/main/dashboard',
+      initialLocation: '/login',
       debugLogDiagnostics: true,
       routes: [
         GoRoute(
@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> {
         ),
       ],
     );
-    super.initState(); // Tambahkan ini
+    super.initState();
   }
 
   @override
@@ -83,7 +83,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Admin | GPD',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme(context),
-      routerConfig: _router, // Gunakan routerConfig agar lebih singkat
+      routerConfig: _router,
     );
   }
 }
