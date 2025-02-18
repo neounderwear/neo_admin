@@ -106,7 +106,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
               IconButton(
                 icon: const Icon(IconlyBold.edit, size: 18.0),
                 onPressed: () {
-                  // TODO: Tambahkan logika edit
+                  // TODO: TAMBAHKAN FUNGSI EDIT
                 },
               ),
               IconButton(
@@ -132,7 +132,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                             child: const Text('Hapus',
                                 style: TextStyle(color: Colors.red)),
                             onPressed: () {
-                              // TODO: Tambahkan logika hapus
+                              // TODO: TAMBAHKAN FUNGSI HAPUS
                               Navigator.of(context).pop();
                             },
                           ),
