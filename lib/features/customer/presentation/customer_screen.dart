@@ -5,8 +5,10 @@ class CustomerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Halaman Customer'),
+    return Scaffold(
+      body: const Center(
+        child: Text('Halaman Customer'),
+      ),
     );
   }
 }
