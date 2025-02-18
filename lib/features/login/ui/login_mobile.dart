@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class LoginMobile extends StatefulWidget {
-  const LoginMobile({super.key});
+  final Function function;
+
+  const LoginMobile({
+    super.key,
+    required this.function,
+  });
 
   @override
   State<LoginMobile> createState() => _LoginMobileState();
@@ -47,6 +52,7 @@ class _LoginMobileState extends State<LoginMobile> {
           }
         },
         child: Scaffold(
+          backgroundColor: Colors.white,
           body: Center(
             child: Padding(
               padding:
@@ -141,14 +147,16 @@ class _LoginMobileState extends State<LoginMobile> {
                     height: size.height * 0.05,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 40.0),
+                        minimumSize: Size(double.infinity, 40.0),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Masuk',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16.0),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        widget.function();
+                      },
                     ),
                   ),
                   SizedBox(height: size.height * 0.05),
