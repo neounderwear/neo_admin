@@ -7,51 +7,16 @@ import 'package:neo_admin/features/brand/presentation/ui/brand_screen.dart';
 import 'package:neo_admin/features/category/presentation/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
 import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
-import 'package:neo_admin/features/login/main/login_screen.dart';
+import 'package:neo_admin/features/login/presentation/login_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
-import 'package:neo_admin/features/product/presentation/ui/add_product_screen.dart';
 import 'package:neo_admin/features/product/presentation/ui/product_screen.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  final GoRouter router = GoRouter(
-    routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/main',
-        builder: (context, state) => const MainScreen(name: 'Herlan'),
-      ),
-      GoRoute(
-        path: '/dashboard',
-        builder: (context, state) => const DashboardScreen(),
-      ),
-      GoRoute(
-        path: '/banner',
-        builder: (context, state) => BannerScreen(),
-      ),
-      GoRoute(
-        path: '/category',
-        builder: (context, state) => CategoryScreen(),
-      ),
-      GoRoute(
-        path: '/brand',
-        builder: (context, state) => BrandScreen(),
-      ),
-      GoRoute(
-        path: '/product',
-        builder: (context, state) => ProductScreen(),
-      ),
-    ],
-    initialLocation: '/main',
-    debugLogDiagnostics: true,
-    routerNeglect: true,
-  );
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -112,11 +77,6 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
-        GoRoute(
-          path: '/add-product',
-          parentNavigatorKey: _rootNavigatorKey,
-          builder: (context, state) => const AddProductScreen(),
-        ),
       ],
     );
     super.initState();
@@ -128,9 +88,9 @@ class _MyAppState extends State<MyApp> {
       title: 'Admin | GPD',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme(context),
-      routeInformationParser: router.routeInformationParser,
-      routerDelegate: router.routerDelegate,
-      routeInformationProvider: router.routeInformationProvider,
+      routeInformationParser: _router.routeInformationParser,
+      routerDelegate: _router.routerDelegate,
+      routeInformationProvider: _router.routeInformationProvider,
     );
   }
 }
