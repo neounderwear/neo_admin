@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:go_router/go_router.dart';
 import 'package:neo_admin/features/banner/presentation/ui/banner_screen.dart';
 import 'package:neo_admin/features/brand/presentation/ui/brand_screen.dart';

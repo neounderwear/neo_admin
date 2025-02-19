@@ -7,8 +7,9 @@ import 'package:neo_admin/features/brand/presentation/ui/brand_screen.dart';
 import 'package:neo_admin/features/category/presentation/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
 import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
-import 'package:neo_admin/features/login/presentation/login_screen.dart';
+import 'package:neo_admin/features/login/main/login_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
+import 'package:neo_admin/features/product/presentation/ui/add_product_screen.dart';
 import 'package:neo_admin/features/product/presentation/ui/product_screen.dart';
 
 void main() {
@@ -77,6 +78,10 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
+        GoRoute(
+          path: '/tambah-produk',
+          builder: (context, state) => AddProductScreen(),
+        )
       ],
     );
     super.initState();
@@ -88,9 +93,10 @@ class _MyAppState extends State<MyApp> {
       title: 'Admin | GPD',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme(context),
-      routeInformationParser: _router.routeInformationParser,
-      routerDelegate: _router.routerDelegate,
-      routeInformationProvider: _router.routeInformationProvider,
+      routerConfig: _router,
+      // routeInformationParser: _router.routeInformationParser,
+      // routerDelegate: _router.routerDelegate,
+      // routeInformationProvider: _router.routeInformationProvider,
     );
   }
 }
