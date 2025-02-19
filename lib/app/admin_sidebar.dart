@@ -3,28 +3,48 @@ import 'package:go_router/go_router.dart';
 
 class AdminSidebar extends StatelessWidget {
   final String name;
-  final int selectedIndex;
-  final ValueChanged<int> onItemTapped;
+  final Function(String) onItemTapped;
 
-  const AdminSidebar({
-    super.key,
-    required this.name,
-    required this.selectedIndex,
-    required this.onItemTapped,
-  });
+  const AdminSidebar(
+      {super.key, required this.name, required this.onItemTapped});
 
   final List<Map<String, dynamic>> menuItems = const [
-    {'title': 'Beranda', 'icon': Icons.dashboard_rounded},
-    {'title': 'Banner', 'icon': Icons.image_rounded},
-    {'title': 'Kategori', 'icon': Icons.category_rounded},
-    {'title': 'Merek', 'icon': Icons.branding_watermark_rounded},
-    {'title': 'Produk', 'icon': Icons.inventory_2_rounded},
-    {'title': 'Pesanan', 'icon': Icons.shopping_cart_rounded},
-    {'title': 'Customer', 'icon': Icons.people_rounded},
+    {
+      'title': 'Beranda',
+      'icon': Icons.dashboard_rounded,
+      'route': '/main/dashboard'
+    },
+    {'title': 'Banner', 'icon': Icons.image_rounded, 'route': '/main/banner'},
+    {
+      'title': 'Kategori',
+      'icon': Icons.category_rounded,
+      'route': '/main/category'
+    },
+    {
+      'title': 'Merek',
+      'icon': Icons.branding_watermark_rounded,
+      'route': '/main/brand'
+    },
+    {
+      'title': 'Produk',
+      'icon': Icons.inventory_2_rounded,
+      'route': '/main/product'
+    },
+    {
+      'title': 'Pesanan',
+      'icon': Icons.shopping_cart_rounded,
+      'route': '/main/order'
+    },
+    {
+      'title': 'Customer',
+      'icon': Icons.people_rounded,
+      'route': '/main/customer'
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
+    final String currentRoute = GoRouterState.of(context).uri.toString();
     return Container(
       width: 250.0,
       height: double.infinity,
@@ -51,7 +71,7 @@ class AdminSidebar extends StatelessWidget {
               itemCount: menuItems.length,
               itemBuilder: (context, index) {
                 final item = menuItems[index];
-                final isSelected = selectedIndex == index;
+                final isSelected = currentRoute == item['route'];
 
                 return ListTile(
                   leading: Icon(
@@ -67,7 +87,7 @@ class AdminSidebar extends StatelessWidget {
                     ),
                   ),
                   selected: isSelected,
-                  onTap: () => onItemTapped(index),
+                  onTap: () => onItemTapped(item['route']),
                 );
               },
             ),
@@ -82,32 +102,7 @@ class AdminSidebar extends StatelessWidget {
                 'Keluar',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
               ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Mau kemana?'),
-                      content: const Text('Kamu bisa masuk lagi nanti'),
-                      actions: [
-                        TextButton(
-                          child: const Text('Batal'),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        TextButton(
-                          child: const Text(
-                            'Keluar',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                          onPressed: () => context.go('/login'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
+              onPressed: () => context.go('/login'),
             ),
           ),
           const SizedBox(height: 10),
