@@ -16,8 +16,42 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class MyApp extends StatelessWidget {
+  final GoRouter router = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/main',
+        builder: (context, state) => const MainScreen(name: 'Herlan'),
+      ),
+      GoRoute(
+        path: '/dashboard',
+        builder: (context, state) => const DashboardScreen(),
+      ),
+      GoRoute(
+        path: '/banner',
+        builder: (context, state) => BannerScreen(),
+      ),
+      GoRoute(
+        path: '/category',
+        builder: (context, state) => CategoryScreen(),
+      ),
+      GoRoute(
+        path: '/brand',
+        builder: (context, state) => BrandScreen(),
+      ),
+      GoRoute(
+        path: '/product',
+        builder: (context, state) => ProductScreen(),
+      ),
+    ],
+    initialLocation: '/main',
+    debugLogDiagnostics: true,
+    routerNeglect: true,
+  );
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -94,7 +128,9 @@ class _MyAppState extends State<MyApp> {
       title: 'Admin | GPD',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme(context),
-      routerConfig: _router,
+      routeInformationParser: router.routeInformationParser,
+      routerDelegate: router.routerDelegate,
+      routeInformationProvider: router.routeInformationProvider,
     );
   }
 }

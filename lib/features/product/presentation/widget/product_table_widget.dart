@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
 import 'package:neo_admin/constant/color.dart';
 import 'package:neo_admin/features/product/data/product_table_model.dart';
@@ -107,7 +106,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
               IconButton(
                 icon: const Icon(IconlyBold.edit, size: 18.0),
                 onPressed: () {
-                  context.go('/add-product');
+                  // TODO: Tambahkan logika edit
                 },
               ),
               IconButton(
@@ -133,7 +132,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                             child: const Text('Hapus',
                                 style: TextStyle(color: Colors.red)),
                             onPressed: () {
-                              // TODO: TAMBAHKAN FUNGSI HAPUS
+                              // TODO: Tambahkan logika hapus
                               Navigator.of(context).pop();
                             },
                           ),

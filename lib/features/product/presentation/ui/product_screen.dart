@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:neo_admin/constant/widget/section_header.dart';
 import 'package:neo_admin/features/product/data/product_table_model.dart';
 import 'package:neo_admin/features/product/presentation/widget/product_table_widget.dart';
@@ -52,70 +51,68 @@ class _ProductScreenState extends State<ProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SectionHeader(text: 'Produk'),
-              const SizedBox(height: 24.0),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18.0),
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionHeader(text: 'Produk'),
+            const SizedBox(height: 24.0),
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18.0,
+                  vertical: 24.0,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18.0,
-                    vertical: 24.0,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 500.0,
-                            child: TextField(
-                              controller: searchController,
-                              focusNode: searchFocusNode,
-                              decoration: InputDecoration(
-                                hintText: 'Cari produk...',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide:
-                                      const BorderSide(color: Colors.grey),
-                                ),
-                                prefixIcon: const Icon(Icons.search),
-                                filled: true,
-                                // fillColor: Colors.grey[200],
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 500.0,
+                          child: TextField(
+                            controller: searchController,
+                            focusNode: searchFocusNode,
+                            decoration: InputDecoration(
+                              hintText: 'Cari produk...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide:
+                                    const BorderSide(color: Colors.grey),
                               ),
+                              prefixIcon: const Icon(Icons.search),
+                              filled: true,
+                              // fillColor: Colors.grey[200],
                             ),
                           ),
-                          const SizedBox(width: 12.0),
-                          SizedBox(
-                            height: 39.0,
-                            child: ElevatedButton.icon(
-                              icon: const Icon(Icons.add),
-                              label: const Text('Tambah Produk'),
-                              onPressed: () {
-                                context.go('/add-product');
-                              },
-                            ),
+                        ),
+                        const SizedBox(width: 12.0),
+                        SizedBox(
+                          height: 39.0,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Tambah Produk'),
+                            onPressed: () {
+                              // TODO: Tambahkan aksi tambah produk
+                            },
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 24.0),
-                      ProductTableWidget(products: products),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24.0),
+                    ProductTableWidget(products: products),
+                  ],
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );

@@ -8,37 +8,35 @@ class CategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SectionHeader(text: 'Kategori'),
-                  SizedBox(
-                    height: 39.0,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(),
-                      icon: const Icon(Icons.add),
-                      label: const Text('Tambah Baru'),
-                      onPressed: () {
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => AddCategoryWidget(),
-                        );
-                      },
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 24.0),
-              CategoryTableWidget(),
-            ],
-          ),
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SectionHeader(text: 'Kategori'),
+                SizedBox(
+                  height: 39.0,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Tambah Baru'),
+                    onPressed: () {
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => AddCategoryWidget(),
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 24.0),
+            CategoryTableWidget(),
+          ],
         ),
       ),
     );
