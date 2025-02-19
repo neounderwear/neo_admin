@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:go_router/go_router.dart';
 import 'package:neo_admin/features/banner/presentation/ui/banner_screen.dart';
 import 'package:neo_admin/features/brand/presentation/ui/brand_screen.dart';
 import 'package:neo_admin/features/category/presentation/ui/category_screen.dart';
@@ -9,35 +11,9 @@ import 'package:neo_admin/features/product/presentation/ui/product_screen.dart';
 import 'admin_header.dart';
 import 'admin_sidebar.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends StatelessWidget {
   final String name;
-  const MainScreen({
-    super.key,
-    required this.name,
-  });
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = [
-    const DashboardScreen(),
-    const BannerScreen(),
-    const CategoryScreen(),
-    const BrandScreen(),
-    const ProductScreen(),
-    const OrderScreen(),
-    const CustomerScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  const MainScreen({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -46,18 +22,41 @@ class _MainScreenState extends State<MainScreen> {
       body: Row(
         children: [
           AdminSidebar(
-            name: widget.name,
-            selectedIndex: _selectedIndex,
-            onItemTapped: _onItemTapped,
+            name: name,
+            onItemTapped: (route) {
+              context.go(route);
+            },
           ),
           Expanded(
-            child: IndexedStack(
-              index: _selectedIndex,
-              children: _pages,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: _buildPage(context),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildPage(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.toString();
+    switch (location) {
+      case '/main/dashboard':
+        return const DashboardScreen();
+      case '/main/banner':
+        return const BannerScreen();
+      case '/main/category':
+        return const CategoryScreen();
+      case '/main/brand':
+        return const BrandScreen();
+      case '/main/product':
+        return const ProductScreen();
+      case '/main/order':
+        return const OrderScreen();
+      case '/main/customer':
+        return const CustomerScreen();
+      default:
+        return const Center(child: Text('Page not found'));
+    }
   }
 }

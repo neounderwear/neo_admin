@@ -7,33 +7,35 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(24.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SectionHeader(text: 'Beranda'),
-            SizedBox(height: 24.0),
-            Wrap(
-              children: [
-                Row(
-                  children: [
-                    DataCard(width: 400.0, height: 200.0),
-                    DataCard(width: 400.0, height: 200.0),
-                    DataCard(width: 400.0, height: 200.0),
-                    DataCard(width: 400.0, height: 200.0),
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                DataCard(width: 1200.0, height: 500.0),
-                DataCard(width: 400.0, height: 500.0),
-              ],
-            )
-          ],
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.all(18.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SectionHeader(text: 'Beranda'),
+              SizedBox(height: 24.0),
+              Wrap(
+                children: [
+                  Row(
+                    children: [
+                      DataCard(width: 400.0, height: 200.0),
+                      DataCard(width: 400.0, height: 200.0),
+                      DataCard(width: 400.0, height: 200.0),
+                      DataCard(width: 400.0, height: 200.0),
+                    ],
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  DataCard(width: 1200.0, height: 500.0),
+                  DataCard(width: 400.0, height: 500.0),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
