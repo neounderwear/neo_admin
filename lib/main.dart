@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neo_admin/app/main_screen.dart';
 import 'package:neo_admin/constant/theme.dart';
@@ -7,12 +8,21 @@ import 'package:neo_admin/features/brand/presentation/ui/brand_screen.dart';
 import 'package:neo_admin/features/category/presentation/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
 import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
+import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/main/login_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
 import 'package:neo_admin/features/product/presentation/ui/add_product_screen.dart';
 import 'package:neo_admin/features/product/presentation/ui/product_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://wovklugpxmjwinfeaded.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvdmtsdWdweG1qd2luZmVhZGVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAyMDQ2MzIsImV4cCI6MjA1NTc4MDYzMn0.EvYq1oi4tnF4Ix19ZBV4RGaKVsl1lli8hXb1VXcVXFI',
+  );
   runApp(MyApp());
 }
 
@@ -89,14 +99,19 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Admin | GPD',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme(context),
-      routerConfig: _router,
-      // routeInformationParser: _router.routeInformationParser,
-      // routerDelegate: _router.routerDelegate,
-      // routeInformationProvider: _router.routeInformationProvider,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => LoginBloc()),
+      ],
+      child: MaterialApp.router(
+        title: 'Admin | GPD',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.theme(context),
+        routerConfig: _router,
+        // routeInformationParser: _router.routeInformationParser,
+        // routerDelegate: _router.routerDelegate,
+        // routeInformationProvider: _router.routeInformationProvider,
+      ),
     );
   }
 }
