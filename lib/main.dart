@@ -7,7 +7,9 @@ import 'package:neo_admin/features/banner/presentation/ui/banner_screen.dart';
 import 'package:neo_admin/features/brand/bloc/brand_bloc.dart';
 import 'package:neo_admin/features/brand/data/brand_service.dart';
 import 'package:neo_admin/features/brand/view/ui/brand_screen.dart';
-import 'package:neo_admin/features/category/presentation/ui/category_screen.dart';
+import 'package:neo_admin/features/category/bloc/category_bloc.dart';
+import 'package:neo_admin/features/category/data/category_service.dart';
+import 'package:neo_admin/features/category/view/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
 import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
 import 'package:neo_admin/features/login/bloc/login_bloc.dart';
@@ -105,6 +107,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         BlocProvider(create: (context) => LoginBloc()),
         BlocProvider(create: (context) => BrandBloc(BrandService())),
+        BlocProvider(create: (context) => CategoryBloc(CategoryService())),
       ],
       child: MaterialApp.router(
         title: 'Admin | GPD',

@@ -21,9 +21,12 @@ class BrandService {
         .insert({'brand_name': name, 'image_url': imageUrl});
   }
 
-  // Fungsi untuk mengubah merek di tabel brands
+  // Fungsi untuk mengubah data merek di tabel brands
   Future<void> updateBrands(
-      String id, String name, Uint8List? imageBytes) async {
+    String id,
+    String name,
+    Uint8List? imageBytes,
+  ) async {
     try {
       final Map<String, dynamic> updateData = {'brand_name': name};
       if (imageBytes != null) {
