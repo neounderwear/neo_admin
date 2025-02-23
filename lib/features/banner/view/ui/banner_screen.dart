@@ -7,6 +7,7 @@ import 'package:neo_admin/features/banner/bloc/banner_state.dart';
 import 'package:neo_admin/features/banner/view/widget/banner_form_widget.dart';
 import 'package:neo_admin/features/banner/view/widget/banner_table_widget.dart';
 
+// Halaman utama banner toko
 class BannerScreen extends StatefulWidget {
   const BannerScreen({super.key});
 

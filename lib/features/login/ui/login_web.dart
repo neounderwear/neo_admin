@@ -1,9 +1,12 @@
+import 'package:delightful_toast/delight_toast.dart';
+import 'package:delightful_toast/toast/components/toast_card.dart';
+import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
-import 'package:neo_admin/constant/widget/alert_dialog.dart';
+import 'package:neo_admin/constant/asset_manager.dart';
 import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/bloc/login_state.dart';
 
@@ -47,25 +50,30 @@ class _LoginWebState extends State<LoginWeb> {
         child: BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccess) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialogSuccess(
-                  label: 'Sip, yuk lanjut masuk',
-                  function: () {
-                    context.go('/main/dashboard');
-                  },
-                ),
-              );
+              context.go('/main/dashboard');
+              DelightToastBar(
+                builder: (context) {
+                  return ToastCard(
+                    leading: Image.asset(AssetManager.successIcon),
+                    title: Text('Berhasil Masuk'),
+                    color: Color(0xFFD9C7B3),
+                  );
+                },
+                autoDismiss: true,
+                position: DelightSnackbarPosition.top,
+              ).show(context);
             } else if (state is LoginFailure) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialogFailed(
-                  label: state.message,
-                  function: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              );
+              DelightToastBar(
+                builder: (context) {
+                  return ToastCard(
+                    leading: Image.asset(AssetManager.failedIcon),
+                    title: Text(state.message),
+                    color: Color(0xFFD9C7B3),
+                  );
+                },
+                autoDismiss: true,
+                position: DelightSnackbarPosition.top,
+              ).show(context);
             }
           },
           builder: (context, state) {

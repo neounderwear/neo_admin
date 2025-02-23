@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:neo_admin/constant/asset_manager.dart';
-import 'package:neo_admin/constant/color.dart';
 
 class AlertDialogSuccess extends StatelessWidget {
   final String label;
@@ -150,14 +149,15 @@ class AlertDialogWarning extends StatelessWidget {
               ),
               child: const Text('Oke'),
             ),
-            const SizedBox(height: 4.0),
+            const SizedBox(height: 8.0),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
+                side: BorderSide(color: Colors.brown),
                 minimumSize: const Size(double.infinity, 40.0),
-                backgroundColor: AppColor.secondaryColor,
+                backgroundColor: Colors.white,
                 foregroundColor: Colors.brown,
               ),
               child: const Text('Batal'),

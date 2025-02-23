@@ -7,6 +7,7 @@ import 'package:neo_admin/features/category/bloc/category_state.dart';
 import 'package:neo_admin/features/category/view/widget/category_form_widget.dart';
 import 'package:neo_admin/features/category/view/widget/category_table_widget.dart';
 
+// Halaman utama kategori produk
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
 

@@ -6,36 +6,52 @@ import 'package:neo_admin/features/brand/data/brand_service.dart';
 class BrandBloc extends Bloc<BrandEvent, BrandState> {
   final BrandService brandService;
 
-  BrandBloc(this.brandService) : super(BrandState([])) {
+  BrandBloc(this.brandService) : super(BrandInitial()) {
     // Memuat data merek
     on<LoadBrands>((event, emit) async {
-      final brands = await brandService.fetchBrands();
-      emit(BrandState(brands));
+      try {
+        final brands = await brandService.fetchBrands();
+        emit(BrandLoaded(brands));
+      } catch (e) {
+        emit(BrandError(e.toString()));
+      }
     });
 
     // Menambah data merek
     on<AddBrands>((event, emit) async {
-      add(LoadBrands());
-      final imageUrl = await brandService.uploadImage(
-        'brand',
-        event.imageBytes,
-      );
-      await brandService.addBrands(event.name, imageUrl);
-      add(LoadBrands());
+      try {
+        add(LoadBrands());
+        final imageUrl = await brandService.uploadImage(
+          'brand',
+          event.imageBytes,
+        );
+        await brandService.addBrands(event.name, imageUrl);
+        add(LoadBrands());
+      } catch (e) {
+        emit(BrandError(e.toString()));
+      }
     });
 
     // Mengubah data merek
     on<UpdateBrands>((event, emit) async {
-      add(LoadBrands());
-      await brandService.updateBrands(event.id, event.name, event.imageBytes);
-      add(LoadBrands());
+      try {
+        add(LoadBrands());
+        await brandService.updateBrands(event.id, event.name, event.imageBytes);
+        add(LoadBrands());
+      } catch (e) {
+        emit(BrandError(e.toString()));
+      }
     });
 
     // Menghapus data merek
     on<DeleteBrands>((event, emit) async {
-      add(LoadBrands());
-      await brandService.deleteBrands(event.id);
-      add(LoadBrands());
+      try {
+        add(LoadBrands());
+        await brandService.deleteBrands(event.id);
+        add(LoadBrands());
+      } catch (e) {
+        emit(BrandError(e.toString()));
+      }
     });
   }
 }

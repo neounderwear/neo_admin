@@ -7,6 +7,7 @@ import 'package:neo_admin/features/brand/bloc/brand_state.dart';
 import 'package:neo_admin/features/brand/view/widget/brand_form_widget.dart';
 import 'package:neo_admin/features/brand/view/widget/brand_table_widget.dart';
 
+// Halaman utama merek produk
 class BrandScreen extends StatefulWidget {
   const BrandScreen({super.key});
 

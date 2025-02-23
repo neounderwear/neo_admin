@@ -1,11 +1,16 @@
 import 'dart:typed_data';
+import 'package:delightful_toast/delight_toast.dart';
+import 'package:delightful_toast/toast/components/toast_card.dart';
+import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neo_admin/constant/asset_manager.dart';
 import 'package:neo_admin/features/brand/bloc/brand_bloc.dart';
 import 'package:neo_admin/features/brand/bloc/brand_event.dart';
 
+// Widget pop-up untuk menambah/mengubah merek
 class BrandFormWidget extends StatefulWidget {
   final Map<String, dynamic>? brand;
   const BrandFormWidget({super.key, this.brand});
@@ -42,16 +47,32 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
   // Fungsi untuk mengirim data
   void submit() {
     if (nameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nama tidak boleh kosong')),
-      );
+      DelightToastBar(
+        builder: (context) {
+          return ToastCard(
+            leading: Image.asset(AssetManager.warningIcon),
+            title: Text('Nama merek tidak boleh kosong'),
+            color: Color(0xFFD9C7B3),
+          );
+        },
+        autoDismiss: true,
+        position: DelightSnackbarPosition.top,
+      ).show(context);
       return;
     }
 
     if (widget.brand == null && imageBytes == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Logo tidak boleh kosong')),
-      );
+      DelightToastBar(
+        builder: (context) {
+          return ToastCard(
+            leading: Image.asset(AssetManager.warningIcon),
+            title: Text('Logo merek tidak boleh kosong'),
+            color: Color(0xFFD9C7B3),
+          );
+        },
+        autoDismiss: true,
+        position: DelightSnackbarPosition.top,
+      ).show(context);
       return;
     }
 
@@ -68,9 +89,17 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
       }
       Navigator.of(context).pop();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      DelightToastBar(
+        builder: (context) {
+          return ToastCard(
+            leading: Image.asset(AssetManager.failedIcon),
+            title: Text('Error: ${e.toString()}'),
+            color: Color(0xFFD9C7B3),
+          );
+        },
+        autoDismiss: true,
+        position: DelightSnackbarPosition.top,
+      ).show(context);
     }
   }
 
@@ -83,11 +112,12 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: size.width * 0.2,
-          minWidth: size.width * 0.2,
-        ),
+            maxWidth: size.width * 0.2, minWidth: size.width * 0.2),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 36.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24.0,
+            vertical: 36.0,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -161,7 +191,9 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey,
+                        side: BorderSide(color: Colors.brown),
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.brown,
                       ),
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Batal'),
@@ -170,7 +202,24 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
                   const SizedBox(width: 8.0),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: submit,
+                      onPressed: () {
+                        submit();
+                        DelightToastBar(
+                          builder: (context) {
+                            return ToastCard(
+                              leading: Image.asset(AssetManager.successIcon),
+                              title: Text(
+                                widget.brand == null
+                                    ? 'Berhasil upload merek'
+                                    : 'Berhasil menyimpan',
+                              ),
+                              color: Color(0xFFD9C7B3),
+                            );
+                          },
+                          autoDismiss: true,
+                          position: DelightSnackbarPosition.top,
+                        ).show(context);
+                      },
                       child: Text(widget.brand == null ? 'Tambah' : 'Simpan'),
                     ),
                   ),
