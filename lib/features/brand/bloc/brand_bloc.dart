@@ -16,8 +16,10 @@ class BrandBloc extends Bloc<BrandEvent, BrandState> {
     // Menambah data merek
     on<AddBrands>((event, emit) async {
       add(LoadBrands());
-      final imageUrl =
-          await brandService.uploadImage('brand', event.imageBytes);
+      final imageUrl = await brandService.uploadImage(
+        'brand',
+        event.imageBytes,
+      );
       await brandService.addBrands(event.name, imageUrl);
       add(LoadBrands());
     });
@@ -25,7 +27,6 @@ class BrandBloc extends Bloc<BrandEvent, BrandState> {
     // Mengubah data merek
     on<UpdateBrands>((event, emit) async {
       add(LoadBrands());
-
       await brandService.updateBrands(event.id, event.name, event.imageBytes);
       add(LoadBrands());
     });

@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neo_admin/app/main_screen.dart';
 import 'package:neo_admin/constant/theme.dart';
-import 'package:neo_admin/features/banner/presentation/ui/banner_screen.dart';
+import 'package:neo_admin/features/banner/bloc/banner_bloc.dart';
+import 'package:neo_admin/features/banner/data/banner_service.dart';
+import 'package:neo_admin/features/banner/view/ui/banner_screen.dart';
 import 'package:neo_admin/features/brand/bloc/brand_bloc.dart';
 import 'package:neo_admin/features/brand/data/brand_service.dart';
 import 'package:neo_admin/features/brand/view/ui/brand_screen.dart';
@@ -108,6 +110,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => LoginBloc()),
         BlocProvider(create: (context) => BrandBloc(BrandService())),
         BlocProvider(create: (context) => CategoryBloc(CategoryService())),
+        BlocProvider(create: (context) => BannerBloc(BannerService())),
       ],
       child: MaterialApp.router(
         title: 'Admin | GPD',
