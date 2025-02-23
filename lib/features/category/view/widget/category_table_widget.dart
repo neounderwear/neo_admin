@@ -82,7 +82,7 @@ class CategoryTableWidget extends StatelessWidget {
                                   barrierDismissible: false,
                                   context: context,
                                   builder: (context) => AlertDialogWarning(
-                                    label: 'Merek bakalan dihapus permanen',
+                                    label: 'Kategori bakalan dihapus permanen',
                                     function: () {
                                       context.read<CategoryBloc>().add(
                                             DeleteCategories(
