@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
       ],
       child: MaterialApp.router(
         title: 'Admin | GPD',
-        debugShowCheckedModeBanner: false,
+        // debugShowCheckedModeBanner: false,
         theme: AppTheme.theme(context),
         routerConfig: _router,
         // routeInformationParser: _router.routeInformationParser,
