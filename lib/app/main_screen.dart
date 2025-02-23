@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neo_admin/features/banner/presentation/ui/banner_screen.dart';
-import 'package:neo_admin/features/brand/presentation/ui/brand_screen.dart';
+import 'package:neo_admin/features/brand/view/ui/brand_screen.dart';
 import 'package:neo_admin/features/category/presentation/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
 import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
