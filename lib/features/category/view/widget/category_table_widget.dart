@@ -3,17 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:neo_admin/constant/color.dart';
 import 'package:neo_admin/constant/widget/alert_dialog.dart';
-import 'package:neo_admin/features/brand/bloc/brand_bloc.dart';
-import 'package:neo_admin/features/brand/bloc/brand_event.dart';
-import 'package:neo_admin/features/brand/bloc/brand_state.dart';
-import 'package:neo_admin/features/brand/view/widget/brand_form_widget.dart';
+import 'package:neo_admin/features/category/bloc/category_bloc.dart';
+import 'package:neo_admin/features/category/bloc/category_event.dart';
+import 'package:neo_admin/features/category/bloc/category_state.dart';
+import 'package:neo_admin/features/category/view/widget/category_form_widget.dart';
 
-class BrandTableWidget extends StatelessWidget {
-  const BrandTableWidget({super.key});
+class CategoryTableWidget extends StatelessWidget {
+  const CategoryTableWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BrandBloc, BrandState>(
+    return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, state) {
         return Container(
           width: double.infinity,
@@ -34,32 +34,32 @@ class BrandTableWidget extends StatelessWidget {
             columns: const <DataColumn>[
               DataColumn(
                 headingRowAlignment: MainAxisAlignment.center,
-                label: Text('Logo'),
+                label: Text('Icon'),
               ),
               DataColumn(
                 headingRowAlignment: MainAxisAlignment.center,
-                label: Text('Nama'),
+                label: Text('Kategori'),
               ),
               DataColumn(
                 headingRowAlignment: MainAxisAlignment.center,
                 label: Text('Aksi'),
               ),
             ],
-            rows: state.brands.map(
-              (brand) {
+            rows: state.categories.map(
+              (category) {
                 return DataRow(
                   cells: <DataCell>[
                     DataCell(Center(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.network(
-                          brand['image_url'],
+                          category['image_url'],
                           width: 150,
                           fit: BoxFit.cover,
                         ),
                       ),
                     )),
-                    DataCell(Center(child: Text(brand['brand_name']))),
+                    DataCell(Center(child: Text(category['category_name']))),
                     DataCell(
                       Center(
                         child: Row(
@@ -72,7 +72,7 @@ class BrandTableWidget extends StatelessWidget {
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (context) =>
-                                        BrandFormWidget(brand: brand));
+                                        CategoryFormWidget(category: category));
                               },
                             ),
                             IconButton(
@@ -84,9 +84,9 @@ class BrandTableWidget extends StatelessWidget {
                                   builder: (context) => AlertDialogWarning(
                                     label: 'Merek bakalan dihapus permanen',
                                     function: () {
-                                      context.read<BrandBloc>().add(
-                                            DeleteBrands(
-                                              brand['id'].toString(),
+                                      context.read<CategoryBloc>().add(
+                                            DeleteCategories(
+                                              category['id'].toString(),
                                             ),
                                           );
                                       Navigator.of(context).pop();

@@ -1,20 +1,21 @@
 import 'dart:typed_data';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:neo_admin/features/brand/bloc/brand_bloc.dart';
-import 'package:neo_admin/features/brand/bloc/brand_event.dart';
+import 'package:neo_admin/features/category/bloc/category_bloc.dart';
+import 'package:neo_admin/features/category/bloc/category_event.dart';
 
-class BrandFormWidget extends StatefulWidget {
-  final Map<String, dynamic>? brand;
-  const BrandFormWidget({super.key, this.brand});
+class CategoryFormWidget extends StatefulWidget {
+  final Map<String, dynamic>? category;
+  const CategoryFormWidget({super.key, this.category});
 
   @override
-  State<BrandFormWidget> createState() => _BrandFormWidgetState();
+  State<CategoryFormWidget> createState() => _CategoryFormWidgetState();
 }
 
-class _BrandFormWidgetState extends State<BrandFormWidget> {
+class _CategoryFormWidgetState extends State<CategoryFormWidget> {
   final nameController = TextEditingController();
   Uint8List? imageBytes;
   String? imageUrl;
@@ -22,9 +23,9 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.brand != null) {
-      nameController.text = widget.brand!['brand_name'] ?? '';
-      imageUrl = widget.brand!['image_url'] ?? '';
+    if (widget.category != null) {
+      nameController.text = widget.category!['category_name'] ?? '';
+      imageUrl = widget.category!['image_url'] ?? '';
     }
   }
 
@@ -48,20 +49,20 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
       return;
     }
 
-    if (widget.brand == null && imageBytes == null) {
+    if (widget.category == null && imageBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Logo tidak boleh kosong')),
       );
       return;
     }
 
-    final bloc = context.read<BrandBloc>();
+    final bloc = context.read<CategoryBloc>();
     try {
-      if (widget.brand == null) {
-        bloc.add(AddBrands(nameController.text, imageBytes!));
+      if (widget.category == null) {
+        bloc.add(AddCategories(nameController.text, imageBytes!));
       } else {
-        bloc.add(UpdateBrands(
-          widget.brand!['id'].toString(),
+        bloc.add(UpdateCategories(
+          widget.category!['id'].toString(),
           nameController.text,
           imageBytes,
         ));
@@ -142,7 +143,7 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Nama Merek', style: TextStyle(fontSize: 14.0)),
+                  const Text('Nama Kategori', style: TextStyle(fontSize: 14.0)),
                   const SizedBox(width: 16.0),
                   Expanded(
                     child: TextField(
@@ -171,7 +172,8 @@ class _BrandFormWidgetState extends State<BrandFormWidget> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: submit,
-                      child: Text(widget.brand == null ? 'Tambah' : 'Simpan'),
+                      child:
+                          Text(widget.category == null ? 'Tambah' : 'Simpan'),
                     ),
                   ),
                 ],

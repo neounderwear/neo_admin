@@ -6,7 +6,7 @@ import 'package:neo_admin/features/login/ui/login_mobile.dart';
 import 'package:neo_admin/features/login/ui/login_web.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// Layout Builder
+// Layout Builder untuk Login Screen Admin
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 

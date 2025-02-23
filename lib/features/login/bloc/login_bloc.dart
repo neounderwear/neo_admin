@@ -7,7 +7,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final SupabaseClient supabase = Supabase.instance.client;
 
   LoginBloc() : super(LoginInitial()) {
-    // Login
+    // Login Bloc
     on<LoginSubmitted>((event, emit) async {
       emit(LoginLoading());
       try {
@@ -26,7 +26,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
     });
 
-    // Logout
+    // Logout Bloc
     on<LogoutRequested>((event, emit) async {
       try {
         await supabase.auth.signOut();
