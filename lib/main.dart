@@ -17,8 +17,10 @@ import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.da
 import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/main/login_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
-import 'package:neo_admin/features/product/presentation/ui/add_product_screen.dart';
-import 'package:neo_admin/features/product/presentation/ui/product_screen.dart';
+import 'package:neo_admin/features/product/bloc/product_bloc.dart';
+import 'package:neo_admin/features/product/data/product_service.dart';
+import 'package:neo_admin/features/product/view/ui/product_form_widget.dart';
+import 'package:neo_admin/features/product/view/ui/product_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -96,7 +98,7 @@ class _MyAppState extends State<MyApp> {
         ),
         GoRoute(
           path: '/tambah-produk',
-          builder: (context, state) => AddProductScreen(),
+          builder: (context, state) => ProductFormWidget(),
         )
       ],
     );
@@ -111,6 +113,11 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => BrandBloc(BrandService())),
         BlocProvider(create: (context) => CategoryBloc(CategoryService())),
         BlocProvider(create: (context) => BannerBloc(BannerService())),
+        BlocProvider(
+          create: (context) => ProductBloc(
+            ProductService(Supabase.instance.client),
+          ),
+        ),
       ],
       child: MaterialApp.router(
         title: 'Admin | GPD',
