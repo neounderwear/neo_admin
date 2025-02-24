@@ -7,10 +7,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ProductService productService;
 
   ProductBloc(this.productService) : super(ProductInitial()) {
-    // Menampilkan produk
+    // Memuat produk
     on<LoadProducts>((event, emit) async {
       try {
-        emit(ProductLoading());
         final product = await productService.getProducts();
         emit(ProductLoaded(product));
       } catch (e) {
@@ -21,7 +20,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     // Menampilkan produk berdasarkan ID
     on<LoadProductById>((event, emit) async {
       try {
-        emit(ProductLoading());
         final product = await productService.getProductById(event.id);
         emit(SingleProductLoaded(product));
       } catch (e) {
@@ -32,10 +30,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     // Menambah produk baru
     on<AddProducts>((event, emit) async {
       try {
-        emit(ProductLoading());
+        add(LoadProducts());
         await productService.createProduct(event.product);
-        final product = await productService.getProducts();
-        emit(ProductLoaded(product));
+        add(LoadProducts());
       } catch (e) {
         emit(ProductError(e.toString()));
       }
@@ -44,10 +41,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     // Mengupdate data produk
     on<UpdateProducts>((event, emit) async {
       try {
-        emit(ProductLoading());
+        add(LoadProducts());
         await productService.updateProduct(event.product);
-        final product = await productService.getProducts();
-        emit(ProductLoaded(product));
+        add(LoadProducts());
       } catch (e) {
         emit(ProductError(e.toString()));
       }
@@ -56,10 +52,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     // Menghapus produk
     on<DeleteProducts>((event, emit) async {
       try {
-        emit(ProductLoading());
+        add(LoadProducts());
         await productService.deleteProduct(event.id);
-        final product = await productService.getProducts();
-        emit(ProductLoaded(product));
+        add(LoadProducts());
       } catch (e) {
         emit(ProductError(e.toString()));
       }
