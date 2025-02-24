@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:neo_admin/constant/widget/form_label.dart';
 import 'package:neo_admin/features/product/view/widget/add_product_image.dart';
 
+// Widget yang menampilkan daftar produk
+// dalam bentuk tabel
 class ProductFormWidget extends StatefulWidget {
   const ProductFormWidget({super.key});
   @override
