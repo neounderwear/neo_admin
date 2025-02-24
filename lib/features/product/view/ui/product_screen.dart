@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neo_admin/constant/widget/section_header.dart';
-import 'package:neo_admin/features/product/data/product_table_model.dart';
-import 'package:neo_admin/features/product/presentation/widget/product_table_widget.dart';
+import 'package:neo_admin/features/product/view/widget/product_table_widget.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -14,27 +13,6 @@ class ProductScreen extends StatefulWidget {
 class _ProductScreenState extends State<ProductScreen> {
   late TextEditingController searchController;
   late FocusNode searchFocusNode;
-
-  List<ProductTableModel> products = [
-    ProductTableModel(
-      productName: 'Pierre Cardin',
-      imageUrl:
-          'https://images.unsplash.com/photo-1614850715649-1d0106293bd1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      productPrice: '120000',
-      productQty: '20',
-      productOrdered: '120',
-      productStatus: true,
-    ),
-    ProductTableModel(
-      productName: 'Gucci Sneakers',
-      imageUrl:
-          'https://images.unsplash.com/photo-1614850715649-1d0106293bd1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      productPrice: '120000',
-      productQty: '20',
-      productOrdered: '120',
-      productStatus: true,
-    ),
-  ];
 
   @override
   void initState() {
@@ -109,7 +87,7 @@ class _ProductScreenState extends State<ProductScreen> {
                         ],
                       ),
                       const SizedBox(height: 24.0),
-                      ProductTableWidget(products: products),
+                      ProductTableWidget(),
                     ],
                   ),
                 ),

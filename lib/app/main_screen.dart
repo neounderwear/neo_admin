@@ -6,7 +6,7 @@ import 'package:neo_admin/features/category/view/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
 import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
-import 'package:neo_admin/features/product/presentation/ui/product_screen.dart';
+import 'package:neo_admin/features/product/view/ui/product_screen.dart';
 import 'admin_header.dart';
 import 'admin_sidebar.dart';
 
