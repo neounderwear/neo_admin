@@ -98,7 +98,11 @@ class _MyAppState extends State<MyApp> {
         ),
         GoRoute(
           path: '/tambah-produk',
-          builder: (context, state) => ProductFormWidget(),
+          builder: (context, state) => ProductFormWidget(
+            productService: ProductService(
+              Supabase.instance.client,
+            ),
+          ),
         )
       ],
     );

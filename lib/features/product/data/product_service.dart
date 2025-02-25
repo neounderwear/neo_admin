@@ -19,7 +19,6 @@ class ProductService {
       return data.map((json) {
         final product = Product.fromJson(json);
 
-        // Parse related data
         if (json['product_variants'] != null) {
           product.variants?.addAll(
             (json['product_variants'] as List)

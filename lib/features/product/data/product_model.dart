@@ -1,4 +1,3 @@
-// lib/models/product.dart
 class Product {
   final int id;
   final String? productName;
@@ -35,6 +34,44 @@ class Product {
     this.images,
     this.variantOptions,
   });
+
+  Product copyWith({
+    int? id,
+    String? productName,
+    String? productDesc,
+    String? productThumb,
+    int? brandId,
+    int? categoryId,
+    String? productType,
+    double? retailPrice,
+    double? resellerPrice,
+    int? productStock,
+    bool? productStatus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    List<ProductVariant>? variants,
+    List<ProductImage>? images,
+    List<ProductVariantOption>? variantOptions,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      productName: productName ?? this.productName,
+      productDesc: productDesc ?? this.productDesc,
+      productThumb: productThumb ?? this.productThumb,
+      brandId: brandId ?? this.brandId,
+      categoryId: categoryId ?? this.categoryId,
+      productType: productType ?? this.productType,
+      retailPrice: retailPrice ?? this.retailPrice,
+      resellerPrice: resellerPrice ?? this.resellerPrice,
+      productStock: productStock ?? this.productStock,
+      productStatus: productStatus ?? this.productStatus,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      variants: variants ?? this.variants,
+      images: images ?? this.images,
+      variantOptions: variantOptions ?? this.variantOptions,
+    );
+  }
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
