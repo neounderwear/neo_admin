@@ -99,9 +99,7 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: '/tambah-produk',
           builder: (context, state) => ProductFormWidget(
-            productService: ProductService(
-              Supabase.instance.client,
-            ),
+            productService: ProductService(),
           ),
         )
       ],
@@ -117,11 +115,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => BrandBloc(BrandService())),
         BlocProvider(create: (context) => CategoryBloc(CategoryService())),
         BlocProvider(create: (context) => BannerBloc(BannerService())),
-        BlocProvider(
-          create: (context) => ProductBloc(
-            ProductService(Supabase.instance.client),
-          ),
-        ),
+        BlocProvider(create: (context) => ProductBloc(ProductService())),
       ],
       child: MaterialApp.router(
         title: 'Admin | GPD',

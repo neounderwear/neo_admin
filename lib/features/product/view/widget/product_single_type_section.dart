@@ -1,6 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-
 import 'package:neo_admin/constant/widget/form_label.dart';
 import 'package:neo_admin/features/product/data/product_model.dart';
 
@@ -64,6 +62,8 @@ class ProductSingleTypeSection extends StatelessWidget {
                               fontSize: 14.0,
                             ),
                           ),
+                          validator: (value) =>
+                              value!.isEmpty ? 'Harga jual harus diisi' : null,
                         ),
                       ),
                     ],

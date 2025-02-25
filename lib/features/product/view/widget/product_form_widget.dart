@@ -11,6 +11,7 @@ import 'package:neo_admin/features/product/data/product_model.dart';
 import 'package:neo_admin/features/product/data/product_service.dart';
 import 'package:neo_admin/features/product/view/widget/add_product_image.dart';
 import 'package:neo_admin/features/product/view/widget/product_detail_section.dart';
+import 'package:neo_admin/features/product/view/widget/product_single_type_section.dart';
 import 'package:neo_admin/features/product/view/widget/product_type_section.dart';
 
 // Widget halaman untuk menambah/mengubah produk
@@ -131,8 +132,13 @@ class _ProductFormWidgetState extends State<ProductFormWidget> {
                       ProductTypeSection(),
                       SizedBox(height: size.height * 0.02),
                       // IF type is Single
-
-                      SizedBox(height: size.height * 0.02),
+                      // ProductSingleTypeSection(
+                      //   product: product,
+                      //   onChanged: (updatedProduct) => setState(
+                      //     () => product = updatedProduct,
+                      //   ),
+                      // ),
+                      // SizedBox(height: size.height * 0.02),
                       Container(
                         decoration: const BoxDecoration(
                           color: Colors.white,

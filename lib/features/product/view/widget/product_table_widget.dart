@@ -143,7 +143,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                                     function: () {
                                       context.read<ProductBloc>().add(
                                             DeleteProducts(
-                                              product.id,
+                                              product.id!,
                                             ),
                                           );
                                       Navigator.of(context).pop();

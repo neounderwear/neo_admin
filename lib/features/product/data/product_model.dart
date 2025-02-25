@@ -1,5 +1,6 @@
+// product.dart
 class Product {
-  final int id;
+  final int? id;
   final String? productName;
   final String? productDesc;
   final String? productThumb;
@@ -13,11 +14,11 @@ class Product {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final List<ProductVariant>? variants;
-  final List<ProductImage>? images;
   final List<ProductVariantOption>? variantOptions;
+  final List<ProductImage>? images;
 
   Product({
-    required this.id,
+    this.id,
     this.productName,
     this.productDesc,
     this.productThumb,
@@ -31,47 +32,9 @@ class Product {
     this.createdAt,
     this.updatedAt,
     this.variants,
-    this.images,
     this.variantOptions,
+    this.images,
   });
-
-  Product copyWith({
-    int? id,
-    String? productName,
-    String? productDesc,
-    String? productThumb,
-    int? brandId,
-    int? categoryId,
-    String? productType,
-    double? retailPrice,
-    double? resellerPrice,
-    int? productStock,
-    bool? productStatus,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    List<ProductVariant>? variants,
-    List<ProductImage>? images,
-    List<ProductVariantOption>? variantOptions,
-  }) {
-    return Product(
-      id: id ?? this.id,
-      productName: productName ?? this.productName,
-      productDesc: productDesc ?? this.productDesc,
-      productThumb: productThumb ?? this.productThumb,
-      brandId: brandId ?? this.brandId,
-      categoryId: categoryId ?? this.categoryId,
-      productType: productType ?? this.productType,
-      retailPrice: retailPrice ?? this.retailPrice,
-      resellerPrice: resellerPrice ?? this.resellerPrice,
-      productStock: productStock ?? this.productStock,
-      productStatus: productStatus ?? this.productStatus,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      variants: variants ?? this.variants,
-      images: images ?? this.images,
-      variantOptions: variantOptions ?? this.variantOptions,
-    );
-  }
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
@@ -116,15 +79,54 @@ class Product {
       'updated_at': updatedAt?.toIso8601String(),
     };
   }
+
+  Product copyWith({
+    int? id,
+    String? productName,
+    String? productDesc,
+    String? productThumb,
+    int? brandId,
+    int? categoryId,
+    String? productType,
+    double? retailPrice,
+    double? resellerPrice,
+    int? productStock,
+    bool? productStatus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    List<ProductVariant>? variants,
+    List<ProductVariantOption>? variantOptions,
+    List<ProductImage>? images,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      productName: productName ?? this.productName,
+      productDesc: productDesc ?? this.productDesc,
+      productThumb: productThumb ?? this.productThumb,
+      brandId: brandId ?? this.brandId,
+      categoryId: categoryId ?? this.categoryId,
+      productType: productType ?? this.productType,
+      retailPrice: retailPrice ?? this.retailPrice,
+      resellerPrice: resellerPrice ?? this.resellerPrice,
+      productStock: productStock ?? this.productStock,
+      productStatus: productStatus ?? this.productStatus,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      variants: variants ?? this.variants,
+      variantOptions: variantOptions ?? this.variantOptions,
+      images: images ?? this.images,
+    );
+  }
 }
 
+// product_variant.dart
 class ProductVariant {
-  final int id;
+  final int? id;
   final int? productId;
   final String? productType;
 
   ProductVariant({
-    required this.id,
+    this.id,
     this.productId,
     this.productType,
   });
@@ -146,8 +148,9 @@ class ProductVariant {
   }
 }
 
+// product_variant_option.dart
 class ProductVariantOption {
-  final int id;
+  final int? id;
   final int? productId;
   final String? variant1;
   final String? variant2;
@@ -156,7 +159,7 @@ class ProductVariantOption {
   final int? productStock;
 
   ProductVariantOption({
-    required this.id,
+    this.id,
     this.productId,
     this.variant1,
     this.variant2,
@@ -194,13 +197,14 @@ class ProductVariantOption {
   }
 }
 
+// product_image.dart
 class ProductImage {
-  final int id;
+  final int? id;
   final int? productId;
   final String? imageUrl;
 
   ProductImage({
-    required this.id,
+    this.id,
     this.productId,
     this.imageUrl,
   });

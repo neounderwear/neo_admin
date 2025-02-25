@@ -43,6 +43,8 @@ dependencies:
   file_picker: ^9.0.0
   image_picker_for_web: ^3.0.6
   delightful_toast: ^1.1.0
+  uuid: ^4.5.1
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

@@ -2,13 +2,12 @@ import 'package:neo_admin/features/product/data/product_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
-  final SupabaseClient _supabaseClient;
+  final supabase = Supabase.instance.client;
 
-  ProductService(this._supabaseClient);
-
+  // Fungsi untuk fetch data produk dari tabel products
   Future<List<Product>> getProducts() async {
     try {
-      final response = await _supabaseClient.from('products').select('''
+      final response = await supabase.from('products').select('''
             *,
             product_variants(*),
             product_variant_options(*),
@@ -52,7 +51,7 @@ class ProductService {
 
   Future<Product> getProductById(int id) async {
     try {
-      final response = await _supabaseClient.from('products').select('''
+      final response = await supabase.from('products').select('''
             *,
             product_variants(*),
             product_variant_options(*),
@@ -67,7 +66,7 @@ class ProductService {
 
   Future<void> createProduct(Product product) async {
     try {
-      await _supabaseClient.from('products').insert(product.toJson());
+      await supabase.from('products').insert(product.toJson());
     } catch (e) {
       throw Exception('Failed to create product: $e');
     }
@@ -75,10 +74,10 @@ class ProductService {
 
   Future<void> updateProduct(Product product) async {
     try {
-      await _supabaseClient
+      await supabase
           .from('products')
           .update(product.toJson())
-          .eq('id', product.id);
+          .eq('id', product.id!);
     } catch (e) {
       throw Exception('Failed to update product: $e');
     }
@@ -86,7 +85,7 @@ class ProductService {
 
   Future<void> deleteProduct(int id) async {
     try {
-      await _supabaseClient.from('products').delete().eq('id', id);
+      await supabase.from('products').delete().eq('id', id);
     } catch (e) {
       throw Exception('Failed to delete product: $e');
     }
