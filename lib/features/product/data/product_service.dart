@@ -104,11 +104,9 @@ class SupabaseService {
               .eq('product_id', product.id!)
               .single();
 
-          if (detailsResponse != null) {
-            product = product.copyWith(
-              productDetail: ProductDetail.fromJson(detailsResponse),
-            );
-          }
+          product = product.copyWith(
+            productDetail: ProductDetail.fromJson(detailsResponse),
+          );
         } else {
           // Get variants for products with variants
           final variantsResponse =

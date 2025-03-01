@@ -18,7 +18,6 @@ import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/main/login_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
 import 'package:neo_admin/features/product/bloc/product_bloc.dart';
-import 'package:neo_admin/features/product/data/product_service.dart';
 import 'package:neo_admin/features/product/view/widget/product_form_widget.dart';
 import 'package:neo_admin/features/product/view/ui/product_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
