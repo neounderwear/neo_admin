@@ -1,25 +1,6 @@
-import 'package:neo_admin/features/product/data/product_model.dart';
+part of 'product_bloc.dart';
 
-abstract class ProductState {}
+@immutable
+sealed class ProductState {}
 
-class ProductInitial extends ProductState {}
-
-class ProductLoading extends ProductState {}
-
-class ProductLoaded extends ProductState {
-  final List<Product> product;
-
-  ProductLoaded(this.product);
-}
-
-class SingleProductLoaded extends ProductState {
-  final Product product;
-
-  SingleProductLoaded(this.product);
-}
-
-class ProductError extends ProductState {
-  final String message;
-
-  ProductError(this.message);
-}
+final class ProductInitial extends ProductState {}

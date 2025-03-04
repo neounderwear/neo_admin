@@ -52,7 +52,7 @@ class BannerService {
   }
 
   // Fungsi untuk mengupload gambar ke storage banner-images
-  Future<String> uploadImage(String pasth, Uint8List fileBytes) async {
+  Future<String> uploadImage(String path, Uint8List fileBytes) async {
     final fileName = '${DateTime.now().millisecondsSinceEpoch}.png';
     await supabase.storage
         .from('banner-images')

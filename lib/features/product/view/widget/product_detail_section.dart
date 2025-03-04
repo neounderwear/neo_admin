@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:neo_admin/constant/widget/form_label.dart';
-import 'package:neo_admin/features/product/data/product_model.dart';
 
 // Widget form untuk input nama dan deskripsi produk
 class ProductDetailSection extends StatelessWidget {
-  final Product product;
-  final ValueChanged<Product> onChanged;
-
   const ProductDetailSection({
     super.key,
-    required this.product,
-    required this.onChanged,
   });
 
   @override
@@ -38,7 +32,7 @@ class ProductDetailSection extends StatelessWidget {
             SizedBox(
               height: size.height * 0.05,
               child: TextFormField(
-                initialValue: product.productName,
+                //initialValue: product.productName,
                 keyboardType: TextInputType.name,
                 textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
@@ -51,9 +45,6 @@ class ProductDetailSection extends StatelessWidget {
                 ),
                 validator: (value) =>
                     value!.isEmpty ? 'Nama produk harus diisi' : null,
-                onChanged: (value) => onChanged(
-                  product.copyWith(productName: value),
-                ),
               ),
             ),
             SizedBox(height: size.height * 0.02),
@@ -61,7 +52,7 @@ class ProductDetailSection extends StatelessWidget {
             const FormLabel(label: 'Deskripsi Produk'),
             SizedBox(height: size.height * 0.01),
             TextFormField(
-              initialValue: product.productDesc,
+              //initialValue: product.productDesc,
               keyboardType: TextInputType.multiline,
               maxLines: 10,
               textInputAction: TextInputAction.newline,
@@ -72,9 +63,6 @@ class ProductDetailSection extends StatelessWidget {
                 ),
                 hintText: 'Deskripsi Produk',
                 hintStyle: TextStyle(color: Colors.grey, fontSize: 14.0),
-              ),
-              onChanged: (value) => onChanged(
-                product.copyWith(productDesc: value),
               ),
             ),
           ],

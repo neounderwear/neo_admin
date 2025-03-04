@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neo_admin/constant/widget/section_header.dart';
-import 'package:neo_admin/features/product/bloc/product_bloc.dart';
-import 'package:neo_admin/features/product/bloc/product_event.dart';
-import 'package:neo_admin/features/product/bloc/product_state.dart';
 import 'package:neo_admin/features/product/view/widget/product_table_widget.dart';
 
 // Halaman utama produk
@@ -24,7 +20,6 @@ class _ProductScreenState extends State<ProductScreen> {
     super.initState();
     searchController = TextEditingController();
     searchFocusNode = FocusNode();
-    context.read<ProductBloc>().add(LoadProducts());
   }
 
   @override
@@ -60,51 +55,49 @@ class _ProductScreenState extends State<ProductScreen> {
                 ],
               ),
               const SizedBox(height: 24.0),
-              BlocBuilder<ProductBloc, ProductState>(builder: (context, state) {
-                return Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18.0),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18.0,
+                    vertical: 24.0,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18.0,
-                      vertical: 24.0,
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: 500.0,
-                              child: TextField(
-                                controller: searchController,
-                                focusNode: searchFocusNode,
-                                decoration: InputDecoration(
-                                  hintText: 'Cari produk...',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    borderSide:
-                                        const BorderSide(color: Colors.grey),
-                                  ),
-                                  prefixIcon: const Icon(Icons.search),
-                                  filled: true,
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: 500.0,
+                            child: TextField(
+                              controller: searchController,
+                              focusNode: searchFocusNode,
+                              decoration: InputDecoration(
+                                hintText: 'Cari produk...',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey),
                                 ),
+                                prefixIcon: const Icon(Icons.search),
+                                filled: true,
                               ),
                             ),
-                            // fillColor: Colors.grey[200]
-                            const SizedBox(width: 12.0),
-                          ],
-                        ),
-                        const SizedBox(height: 24.0),
-                        ProductTableWidget(),
-                      ],
-                    ),
+                          ),
+                          // fillColor: Colors.grey[200]
+                          const SizedBox(width: 12.0),
+                        ],
+                      ),
+                      const SizedBox(height: 24.0),
+                      ProductTableWidget(),
+                    ],
                   ),
-                );
-              }),
+                ),
+              ),
             ],
           ),
         ),
