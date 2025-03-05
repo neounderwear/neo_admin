@@ -39,7 +39,7 @@ class ProductVariantWidget extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(8.0)),
                             ),
-                            hintText: 'Harga jual produk',
+                            hintText: 'Nama varian',
                             hintStyle:
                                 TextStyle(color: Colors.grey, fontSize: 14.0),
                           ),

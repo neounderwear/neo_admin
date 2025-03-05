@@ -1,6 +1,6 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:neo_admin/constant/widget/form_label.dart';
-import 'package:neo_admin/features/product/view/widget/add_product_image.dart';
 
 class ProductImageWidget extends StatelessWidget {
   const ProductImageWidget({super.key});
@@ -28,29 +28,35 @@ class ProductImageWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                AddProductImage(
-                  width: size.height * 0.2,
-                  height: size.height * 0.2,
-                ),
-                SizedBox(width: size.width * 0.01),
-                AddProductImage(
-                  width: size.height * 0.2,
-                  height: size.height * 0.2,
-                ),
-                SizedBox(width: size.width * 0.01),
-                AddProductImage(
-                  width: size.height * 0.2,
-                  height: size.height * 0.2,
-                ),
-                SizedBox(width: size.width * 0.01),
-                AddProductImage(
-                  width: size.height * 0.2,
-                  height: size.height * 0.2,
-                ),
-                SizedBox(width: size.width * 0.01),
-                AddProductImage(
-                  width: size.height * 0.2,
-                  height: size.height * 0.2,
+                DottedBorder(
+                  color: Colors.grey,
+                  strokeWidth: 1.0,
+                  dashPattern: const [3, 2],
+                  borderType: BorderType.RRect,
+                  radius: const Radius.circular(12.0),
+                  child: InkWell(
+                    onTap: () {},
+                    child: Container(
+                      width: size.height * 0.2,
+                      height: size.height * 0.2,
+                      decoration: const BoxDecoration(
+                        color: Colors.white54,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate_rounded,
+                            size: 48.0,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ],
             )

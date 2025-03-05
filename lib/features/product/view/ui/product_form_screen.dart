@@ -1,218 +1,644 @@
+import 'dart:typed_data';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
 import 'package:neo_admin/constant/widget/form_label.dart';
-import 'package:neo_admin/features/product/view/widget/product_detail_section.dart';
-import 'package:neo_admin/features/product/view/widget/product_image_widget.dart';
-import 'package:neo_admin/features/product/view/widget/product_variant_widget.dart';
+import 'package:neo_admin/features/product/bloc/product_bloc.dart';
+import 'package:neo_admin/features/product/bloc/product_event.dart';
+import 'package:neo_admin/features/product/bloc/product_state.dart';
 
 // Widget halaman untuk menambah/mengubah produk
 class ProductFormScreen extends StatefulWidget {
-  const ProductFormScreen({
-    super.key,
-  });
+  final Map<String, dynamic>? product;
+  const ProductFormScreen({super.key, this.product});
 
   @override
   State<ProductFormScreen> createState() => _ProductFormScreenState();
 }
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
-  bool isSimpleProduct = true;
-  String? selectedValue;
-  String? selectedVariant;
+  //
+  List<String> brands = [];
+  List<String> categories = [];
 
-  final formKey = GlobalKey<FormState>();
+  // Controller
+  final _formKey = GlobalKey<FormState>();
+  final nameController = TextEditingController();
+  final descController = TextEditingController();
+
+  // Nilai dropdown
+  String? selectedBrand;
+  String? selectedCategory;
+
+  // Image handling
+  Uint8List? imageBytes;
+  String? imageUrl;
+
+  // manajemen varian
+  List<Map<String, dynamic>> variants = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.product != null) {
+      nameController.text = widget.product!['name'] ?? '';
+      descController.text = widget.product!['description'] ?? '';
+      imageUrl = widget.product!['images'] ?? '';
+      selectedBrand = widget.product!['brand'];
+      selectedCategory = widget.product!['category'];
+
+      // Load variants if editing
+      _loadProductVariants();
+
+      final bloc = context.read<ProductBloc>();
+      bloc.add(LoadBrands());
+      bloc.add(LoadCategories());
+    }
+  }
+
+  void _loadProductVariants() {
+    if (widget.product == null) return;
+
+    final bloc = context.read<ProductBloc>();
+    bloc.productService
+        .fetchVariants(widget.product!['id'])
+        .then((existingVariants) {
+      setState(() {
+        variants = existingVariants;
+      });
+    }).catchError((e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error loading variants: $e')));
+    });
+  }
+
+  Future<void> pickImage() async {
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.image, withData: true);
+    if (result != null) {
+      setState(() {
+        imageBytes = result.files.single.bytes;
+      });
+    }
+  }
+
+  void _addVariant() {
+    setState(() {
+      variants.add({
+        'name': '',
+        'price': 0,
+        'reseller_price': 0,
+        'sku': '',
+        'stock': 0,
+        'weight': 0.0,
+      });
+    });
+  }
+
+  void _removeVariant(int index) {
+    setState(() {
+      variants.removeAt(index);
+    });
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      // Prepare submission
+      final bloc = context.read<ProductBloc>();
+      bloc.add(SubmitProductForm(
+        productId: widget.product?['id'],
+        name: nameController.text,
+        description: descController.text,
+        imageUrl: imageUrl,
+        brand: selectedBrand,
+        category: selectedCategory,
+        variants: variants,
+      ));
+    }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    descController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Buat Produk Baru',
-          style: TextStyle(fontWeight: FontWeight.w600),
+
+    return BlocListener<ProductBloc, ProductState>(
+      listener: (context, state) {
+        if (state is ImageUploadSuccess) {
+          // Update image URL when image is uploaded
+          setState(() {
+            imageUrl = state.imageUrl;
+          });
+        } else if (state is ProductSubmissionSuccess) {
+          // Navigate back to product list
+          context.go('/main/product');
+        } else if (state is ProductError) {
+          // Show error message
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(state.message)));
+        } else if (state is BrandsLoaded) {
+          setState(() {
+            brands = state.brands
+                .map((brand) => brand['brand_name'] as String)
+                .toList();
+          });
+        } else if (state is CategoriesLoaded) {
+          setState(() {
+            categories = state.categories
+                .map((category) => category['category_name'] as String)
+                .toList();
+          });
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.product == null ? 'Buat Produk Baru' : 'Edit Produks',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: Form(
-        key: formKey,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 128.0, vertical: 18.0),
-            child: Column(
-              children: [
-                // Nama dan Deskripsi Produk
-                ProductDetailSection(),
-                SizedBox(height: size.height * 0.02),
-
-                // Foto produk
-                ProductImageWidget(),
-                SizedBox(height: size.height * 0.02),
-
-                // Varian produk
-                ProductVariantWidget(),
-                SizedBox(height: size.height * 0.02),
-
-                // Merek & Kategori produk
-                Row(
-                  children: [
-                    // Merek produk
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(18.0),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18.0,
-                            vertical: 24.0,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Merek Produk
-                              const FormLabel(label: 'Merek Produk'),
-                              SizedBox(height: size.height * 0.01),
-                              SizedBox(
-                                height: size.height * 0.05,
-                                width: double.infinity,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors.grey, width: 1.0),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    color: Colors.white,
+        body: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 128.0, vertical: 18.0),
+              child: Column(
+                children: [
+                  // Nama dan Deskripsi Produk
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18.0),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18.0,
+                        vertical: 24.0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Form Nama Produk
+                          const FormLabel(label: 'Nama Produk'),
+                          SizedBox(height: size.height * 0.01),
+                          SizedBox(
+                            height: size.height * 0.05,
+                            child: TextFormField(
+                                controller: nameController,
+                                keyboardType: TextInputType.name,
+                                textInputAction: TextInputAction.next,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<String>(
-                                        value: selectedValue,
-                                        hint: const Text("Pilih"),
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            selectedValue = newValue;
-                                          });
-                                        },
-                                        items: [
-                                          '777',
-                                          'Pierre Cardin',
-                                          'Rider',
-                                        ].map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
+                                  hintText: 'Nama Produk',
+                                  hintStyle: TextStyle(
+                                      color: Colors.grey, fontSize: 14.0),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Nama produk harus diisi';
+                                  }
+                                  return null;
+                                }),
+                          ),
+                          SizedBox(height: size.height * 0.02),
+                          // Form Deskripsi Produk
+                          const FormLabel(label: 'Deskripsi Produk'),
+                          SizedBox(height: size.height * 0.01),
+                          TextFormField(
+                            controller: descController,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: 10,
+                            textInputAction: TextInputAction.newline,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8.0)),
+                              ),
+                              hintText: 'Deskripsi Produk',
+                              hintStyle:
+                                  TextStyle(color: Colors.grey, fontSize: 14.0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.02),
+
+                  // Foto produk
+                  Container(
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(18.0),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FormLabel(label: 'Foto Produk'),
+                          SizedBox(height: size.height * 0.01),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              DottedBorder(
+                                color: Colors.grey,
+                                strokeWidth: 1.0,
+                                dashPattern: const [3, 2],
+                                borderType: BorderType.RRect,
+                                radius: const Radius.circular(12.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    pickImage();
+                                  },
+                                  child: Container(
+                                    width: size.height * 0.2,
+                                    height: size.height * 0.2,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white54,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(12.0),
                                       ),
                                     ),
+                                    child: imageBytes != null
+                                        ? ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            child: imageBytes != null
+                                                ? Image.memory(imageBytes!,
+                                                    fit: BoxFit.cover)
+                                                : (imageUrl != null &&
+                                                        imageUrl!.isNotEmpty)
+                                                    ? Image.network(imageUrl!,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                                error,
+                                                                stackTrace) =>
+                                                            Icon(Icons
+                                                                .error_outline))
+                                                    : Icon(Icons
+                                                        .add_photo_alternate_rounded),
+                                          )
+                                        : (imageUrl != null &&
+                                                imageUrl!.isNotEmpty)
+                                            ? ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(12.0),
+                                                child: Image.network(
+                                                  imageUrl!,
+                                                  fit: BoxFit.cover,
+                                                  loadingBuilder: (context,
+                                                      child, loadingProgress) {
+                                                    if (loadingProgress ==
+                                                        null) {
+                                                      return child;
+                                                    }
+                                                    return Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    );
+                                                  },
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Center(
+                                                      child: Icon(
+                                                          Icons.error_outline),
+                                                    );
+                                                  },
+                                                ))
+                                            : const Center(
+                                                child: Icon(
+                                                  Icons
+                                                      .add_photo_alternate_rounded,
+                                                  size: 48.0,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
                                   ),
                                 ),
                               ),
                             ],
-                          ),
-                        ),
+                          )
+                        ],
                       ),
                     ),
-                    SizedBox(width: size.height * 0.02),
+                  ),
+                  SizedBox(height: size.height * 0.02),
 
-                    // Kategori produk
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(18.0),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18.0,
-                            vertical: 24.0,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  // Varian produk
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const FormLabel(label: 'Kategori Produk'),
-                              SizedBox(height: size.height * 0.01),
-                              SizedBox(
-                                height: size.height * 0.05,
-                                width: double.infinity,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors.grey, width: 1.0),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    color: Colors.white,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<String>(
-                                        value: selectedValue,
-                                        hint: const Text("Pilih"),
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            selectedValue = newValue;
-                                          });
-                                        },
-                                        items: [
-                                          'Pria',
-                                          'Wanita',
-                                          'Anak-anak',
-                                        ].map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                              const FormLabel(label: 'Varian Produk'),
+                              ElevatedButton(
+                                onPressed: _addVariant,
+                                child: Text('Tambah Varian'),
                               ),
                             ],
                           ),
-                        ),
+
+                          // Variant List
+                          ...variants.asMap().entries.map((entry) {
+                            int index = entry.key;
+                            Map<String, dynamic> variant = entry.value;
+
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue: variant['name'],
+                                      decoration: InputDecoration(
+                                        labelText: 'Nama Varian',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          variants[index]['name'] = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: size.width * 0.01),
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue: variant['sku'],
+                                      decoration: InputDecoration(
+                                        labelText: 'SKU Produk',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          variants[index]['sku'] = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: size.width * 0.01),
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue: variant['price'].toString(),
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        labelText: 'Harga',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          variants[index]['price'] =
+                                              double.tryParse(value) ?? 0;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: size.width * 0.01),
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue:
+                                          variant['reseller_price'].toString(),
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        labelText: 'Harga Reseller',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          variants[index]['reseller_price'] =
+                                              double.tryParse(value) ?? 0;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: size.width * 0.01),
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue: variant['stock'].toString(),
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        labelText: 'Stok',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          variants[index]['stock'] =
+                                              double.tryParse(value) ?? 0;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: size.width * 0.01),
+                                  Expanded(
+                                    child: TextFormField(
+                                      initialValue:
+                                          variant['weight'].toString(),
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        labelText: 'Berat (gr)',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          variants[index]['weight'] =
+                                              double.tryParse(value) ?? 0;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: size.width * 0.01),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _removeVariant(index),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(height: size.height * 0.02),
-              ],
+                  ),
+                  SizedBox(height: size.height * 0.02),
+
+                  // Merek & Kategori produk
+                  Row(
+                    children: [
+                      // Merek produk
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(18.0),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18.0,
+                              vertical: 24.0,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Merek Produk
+                                const FormLabel(label: 'Merek Produk'),
+                                SizedBox(height: size.height * 0.01),
+                                DropdownButtonFormField<String>(
+                                  isExpanded:
+                                      true, // Important for handling width
+                                  value: selectedBrand,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 0),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    hintText: 'Pilih Merek',
+                                  ),
+                                  items: brands.map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value,
+                                          overflow: TextOverflow.ellipsis),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedBrand = newValue;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Pilih merek produk';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: size.height * 0.02),
+
+                      // Kategori produk
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(18.0),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18.0,
+                              vertical: 24.0,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const FormLabel(label: 'Kategori Produk'),
+                                SizedBox(height: size.height * 0.01),
+                                DropdownButtonFormField<String>(
+                                  isExpanded:
+                                      true, // Important for handling width
+                                  value: selectedCategory,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 0),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    hintText: 'Pilih Kategori',
+                                  ),
+                                  items: categories.map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value,
+                                          overflow: TextOverflow.ellipsis),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedCategory = newValue;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Pilih kategori produk';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: size.height * 0.02),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            backgroundColor: Color(0xFFA67A4D),
-            tooltip: 'Simpan produk',
-            onPressed: () {
-              context.push('/main/product');
-            },
-            child: Icon(IconlyBold.upload),
-          ),
-          SizedBox(height: size.height * 0.01),
-          FloatingActionButton(
-            backgroundColor: Color(0xFFA67A4D),
-            tooltip: 'Batal',
-            onPressed: () {
-              context.push('/main/product');
-            },
-            child: Icon(IconlyBold.close_square),
-          ),
-        ],
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              backgroundColor: Color(0xFFA67A4D),
+              tooltip: 'Simpan produk',
+              onPressed: () {
+                _submitForm();
+              },
+              child: Icon(IconlyBold.upload),
+            ),
+            SizedBox(height: size.height * 0.01),
+            FloatingActionButton(
+              backgroundColor: Color(0xFFA67A4D),
+              tooltip: 'Batal',
+              onPressed: () => context.go('/main/product'),
+              child: Icon(IconlyBold.close_square),
+            ),
+          ],
+        ),
       ),
     );
   }

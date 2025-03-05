@@ -1,6 +1,63 @@
-part of 'product_bloc.dart';
+abstract class ProductState {}
 
-@immutable
-sealed class ProductState {}
+// Produk States
+class ProductInitial extends ProductState {}
 
-final class ProductInitial extends ProductState {}
+class ProductLoading extends ProductState {}
+
+class ProductLoaded extends ProductState {
+  final List<Map<String, dynamic>> products;
+
+  ProductLoaded(this.products);
+}
+
+class ProductError extends ProductState {
+  final String message;
+
+  ProductError(this.message);
+}
+
+// Image Upload States
+class ImageUploadSuccess extends ProductState {
+  final String imageUrl;
+
+  ImageUploadSuccess(this.imageUrl);
+}
+
+// Variant States
+class VariantRowUpdated extends ProductState {
+  final List<Map<String, dynamic>> variants;
+
+  VariantRowUpdated(this.variants);
+}
+
+// Product Submission States
+class ProductSubmissionSuccess extends ProductState {}
+
+// Detail Product State
+class ProductDetailLoaded extends ProductState {
+  final Map<String, dynamic> product;
+  final List<Map<String, dynamic>> variants;
+
+  ProductDetailLoaded({required this.product, required this.variants});
+}
+
+class BrandsLoaded extends ProductState {
+  final List<Map<String, dynamic>> brands;
+  BrandsLoaded(this.brands);
+}
+
+class CategoriesLoaded extends ProductState {
+  final List<Map<String, dynamic>> categories;
+  CategoriesLoaded(this.categories);
+}
+
+class BrandsError extends ProductState {
+  final String message;
+  BrandsError(this.message);
+}
+
+class CategoriesError extends ProductState {
+  final String message;
+  CategoriesError(this.message);
+}

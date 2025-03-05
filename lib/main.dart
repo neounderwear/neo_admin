@@ -17,6 +17,8 @@ import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.da
 import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/main/login_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
+import 'package:neo_admin/features/product/bloc/product_bloc.dart';
+import 'package:neo_admin/features/product/data/product_service.dart';
 import 'package:neo_admin/features/product/view/ui/product_form_screen.dart';
 import 'package:neo_admin/features/product/view/ui/product_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -51,7 +53,7 @@ class _MyAppState extends State<MyApp> {
 
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: '/tambah-produk',
+      initialLocation: '/login',
       debugLogDiagnostics: true,
       routes: [
         GoRoute(
@@ -111,7 +113,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => BrandBloc(BrandService())),
         BlocProvider(create: (context) => CategoryBloc(CategoryService())),
         BlocProvider(create: (context) => BannerBloc(BannerService())),
-        // BlocProvider(create: (context) => ProductBloc(ProductService())),
+        BlocProvider(create: (context) => ProductBloc(ProductService())),
       ],
       child: MaterialApp.router(
         title: 'Admin | GPD',
