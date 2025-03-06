@@ -41,23 +41,3 @@ class ProductDetailLoaded extends ProductState {
 
   ProductDetailLoaded({required this.product, required this.variants});
 }
-
-class BrandsLoaded extends ProductState {
-  final List<Map<String, dynamic>> brands;
-  BrandsLoaded(this.brands);
-}
-
-class CategoriesLoaded extends ProductState {
-  final List<Map<String, dynamic>> categories;
-  CategoriesLoaded(this.categories);
-}
-
-class BrandsError extends ProductState {
-  final String message;
-  BrandsError(this.message);
-}
-
-class CategoriesError extends ProductState {
-  final String message;
-  CategoriesError(this.message);
-}

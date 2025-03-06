@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
 
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: '/login',
+      initialLocation: '/tambah-produk',
       debugLogDiagnostics: true,
       routes: [
         GoRoute(

@@ -57,7 +57,3 @@ class SubmitProductForm extends ProductEvent {
     this.variants = const [],
   });
 }
-
-class LoadBrands extends ProductEvent {}
-
-class LoadCategories extends ProductEvent {}

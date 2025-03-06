@@ -20,12 +20,7 @@ class MainScreen extends StatelessWidget {
       appBar: const AdminHeader(),
       body: Row(
         children: [
-          AdminSidebar(
-            name: name,
-            onItemTapped: (route) {
-              context.go(route);
-            },
-          ),
+          AdminSidebar(onItemTapped: (route) => context.go(route)),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

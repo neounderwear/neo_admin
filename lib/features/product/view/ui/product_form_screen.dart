@@ -99,11 +99,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     setState(() {
       variants.add({
         'name': '',
-        'price': 0,
-        'reseller_price': 0,
         'sku': '',
-        'stock': 0,
-        'weight': 0.0,
+        'price': '',
+        'reseller_price': '',
+        'stock': '',
+        'weight': '',
       });
     });
   }
@@ -166,172 +166,185 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 128.0, vertical: 18.0),
-              child: Column(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  // Nama dan Deskripsi Produk
-                  ProductDetailSection(
-                    nameController: nameController,
-                    descController: descController,
-                  ),
-                  SizedBox(height: size.height * 0.02),
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      children: [
+                        // Nama dan Deskripsi Produk
+                        ProductDetailSection(
+                          nameController: nameController,
+                          descController: descController,
+                        ),
+                        SizedBox(height: size.height * 0.02),
 
-                  // Foto produk
-                  ProductImageWidget(),
-                  SizedBox(height: size.height * 0.02),
-
-                  // Varian produk
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const FormLabel(label: 'Varian Produk'),
-                              ElevatedButton(
-                                onPressed: _addVariant,
-                                child: Text('Tambah Varian'),
-                              ),
-                            ],
+                        // Varian produk
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18.0),
                           ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(18.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const FormLabel(label: 'Varian Produk'),
+                                    ElevatedButton(
+                                      onPressed: _addVariant,
+                                      child: Text('Tambah Varian'),
+                                    ),
+                                  ],
+                                ),
 
-                          // Variant List
-                          ...variants.asMap().entries.map((entry) {
-                            int index = entry.key;
-                            Map<String, dynamic> variant = entry.value;
+                                // Variant List
+                                ...variants.asMap().entries.map((entry) {
+                                  int index = entry.key;
+                                  Map<String, dynamic> variant = entry.value;
 
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      initialValue: variant['name'],
-                                      decoration: InputDecoration(
-                                        labelText: 'Nama Varian',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          variants[index]['name'] = value;
-                                        });
-                                      },
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 24.0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextFormField(
+                                            initialValue: variant['name'],
+                                            decoration: InputDecoration(
+                                              labelText: 'Nama Varian',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                variants[index]['name'] = value;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(width: size.width * 0.01),
+                                        Expanded(
+                                          child: TextFormField(
+                                            initialValue: variant['sku'],
+                                            decoration: InputDecoration(
+                                              labelText: 'SKU Produk',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                variants[index]['sku'] = value;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(width: size.width * 0.01),
+                                        Expanded(
+                                          child: TextFormField(
+                                            initialValue:
+                                                variant['price'].toString(),
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              labelText: 'Harga',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                variants[index]['price'] =
+                                                    double.tryParse(value) ?? 0;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(width: size.width * 0.01),
+                                        Expanded(
+                                          child: TextFormField(
+                                            initialValue:
+                                                variant['reseller_price']
+                                                    .toString(),
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              labelText: 'Harga Reseller',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                variants[index]
+                                                        ['reseller_price'] =
+                                                    double.tryParse(value) ?? 0;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(width: size.width * 0.01),
+                                        Expanded(
+                                          child: TextFormField(
+                                            initialValue:
+                                                variant['stock'].toString(),
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              labelText: 'Stok',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                variants[index]['stock'] =
+                                                    double.tryParse(value) ?? 0;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(width: size.width * 0.01),
+                                        Expanded(
+                                          child: TextFormField(
+                                            initialValue:
+                                                variant['weight'].toString(),
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              labelText: 'Berat (gr)',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                variants[index]['weight'] =
+                                                    double.tryParse(value) ?? 0;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(width: size.width * 0.01),
+                                        IconButton(
+                                          icon: Icon(Icons.delete,
+                                              color: Colors.red),
+                                          onPressed: () =>
+                                              _removeVariant(index),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  SizedBox(width: size.width * 0.01),
-                                  Expanded(
-                                    child: TextFormField(
-                                      initialValue: variant['sku'],
-                                      decoration: InputDecoration(
-                                        labelText: 'SKU Produk',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          variants[index]['sku'] = value;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(width: size.width * 0.01),
-                                  Expanded(
-                                    child: TextFormField(
-                                      initialValue: variant['price'].toString(),
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        labelText: 'Harga',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          variants[index]['price'] =
-                                              double.tryParse(value) ?? 0;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(width: size.width * 0.01),
-                                  Expanded(
-                                    child: TextFormField(
-                                      initialValue:
-                                          variant['reseller_price'].toString(),
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        labelText: 'Harga Reseller',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          variants[index]['reseller_price'] =
-                                              double.tryParse(value) ?? 0;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(width: size.width * 0.01),
-                                  Expanded(
-                                    child: TextFormField(
-                                      initialValue: variant['stock'].toString(),
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        labelText: 'Stok',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          variants[index]['stock'] =
-                                              double.tryParse(value) ?? 0;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(width: size.width * 0.01),
-                                  Expanded(
-                                    child: TextFormField(
-                                      initialValue:
-                                          variant['weight'].toString(),
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        labelText: 'Berat (gr)',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          variants[index]['weight'] =
-                                              double.tryParse(value) ?? 0;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(width: size.width * 0.01),
-                                  IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _removeVariant(index),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: size.height * 0.02),
+                      ],
                     ),
                   ),
-                  SizedBox(height: size.height * 0.02),
-
-                  // Merek & Kategori produk
-                  Row(
-                    children: [
-                      // Merek produk
-                      Expanded(
-                        flex: 1,
-                        child: Container(
+                  SizedBox(width: size.width * 0.01),
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        // Foto produk
+                        ProductImageWidget(),
+                        SizedBox(height: size.height * 0.02),
+                        Container(
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.all(
@@ -378,13 +391,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: size.height * 0.02),
-
-                      // Kategori produk
-                      Expanded(
-                        flex: 1,
-                        child: Container(
+                        SizedBox(height: size.height * 0.02),
+                        Container(
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.all(
@@ -431,10 +439,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  SizedBox(height: size.height * 0.02),
                 ],
               ),
             ),

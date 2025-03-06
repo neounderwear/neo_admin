@@ -8,7 +8,7 @@ class ProductService {
   final supabase = Supabase.instance.client;
   final Dio dio = Dio();
 
-  // fetch produk
+  // Fungsi untuk fetch data produk dari tabel products
   Future<List<Map<String, dynamic>>> fetchProducts() async {
     final response = await supabase
         .from('products')
@@ -17,7 +17,7 @@ class ProductService {
     return response;
   }
 
-  // fetch varian produk by id
+  // Fungsi untuk fetch varian produk berdasarkan id
   Future<List<Map<String, dynamic>>> fetchVariants(String productId) async {
     final response = await supabase
         .from('product_variants')
@@ -26,23 +26,25 @@ class ProductService {
     return response;
   }
 
-  // tambah produk
+  // Fungsi untuk menambah produk ke tabel products
   Future<void> addProducts(Map<String, dynamic> productData) async {
     await supabase.from('products').insert(productData);
   }
 
-  // update produk
+  // Fungsi untuk mengubah produk di tabel products
   Future<void> updateProducts(
-      String productId, Map<String, dynamic> productData) async {
+    String productId,
+    Map<String, dynamic> productData,
+  ) async {
     await supabase.from('products').update(productData).eq('id', productId);
   }
 
-  // delete produk
+  // Fungsi untuk menghapus produk dari tabel products
   Future<void> deleteProducts(String productId) async {
     await supabase.from('products').delete().eq('id', productId);
   }
 
-  // upload image
+  // Fungsi untuk mengupload gambar ke storage product-images
   Future<String> uploadImage(String path, Uint8List fileBytes) async {
     final fileName = '${DateTime.now().millisecondsSinceEpoch}.png';
     await supabase.storage
@@ -51,10 +53,10 @@ class ProductService {
     return supabase.storage.from('product-images').getPublicUrl(fileName);
   }
 
+  // Fungsi untuk mengupload produk dengan varian
   Future<String> addProductWithVariants(Map<String, dynamic> productData,
       List<Map<String, dynamic>> variants) async {
     try {
-      // Start a transaction
       final response = await supabase
           .from('products')
           .insert(productData)

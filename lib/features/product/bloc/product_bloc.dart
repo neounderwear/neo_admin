@@ -6,8 +6,6 @@ import 'package:neo_admin/features/product/data/product_service.dart';
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ProductService productService;
   List<Map<String, dynamic>> variantsList = [];
-  List<Map<String, dynamic>> brands = [];
-  List<Map<String, dynamic>> categories = [];
   String? imageUrl;
   String? currentImageUrl;
 

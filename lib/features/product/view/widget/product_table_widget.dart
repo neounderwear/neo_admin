@@ -42,7 +42,6 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
         }
 
         if (state is ProductLoaded) {
-          print("Jumlah Produk: ${state.products.length}");
           if (state.products.isEmpty) {
             return const Center(
               child: Text('Kamu belum menambahkan produk. Tambah sekarang'),

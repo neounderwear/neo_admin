@@ -11,11 +11,9 @@ import 'package:neo_admin/features/login/bloc/login_event.dart';
 import 'package:neo_admin/features/login/bloc/login_state.dart';
 
 class AdminSidebar extends StatelessWidget {
-  final String name;
   final Function(String) onItemTapped;
 
-  const AdminSidebar(
-      {super.key, required this.name, required this.onItemTapped});
+  const AdminSidebar({super.key, required this.onItemTapped});
 
   final List<Map<String, dynamic>> menuItems = const [
     {
@@ -85,20 +83,7 @@ class AdminSidebar extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 100,
-              padding: const EdgeInsets.all(16),
-              child: Center(
-                child: Text(
-                  'Halo, $name',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            SizedBox(height: 24.0),
             Expanded(
               child: ListView.builder(
                 itemCount: menuItems.length,
