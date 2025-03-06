@@ -38,12 +38,24 @@ class ProductDetailSection extends StatelessWidget {
             SizedBox(height: size.height * 0.01),
             SizedBox(
               height: size.height * 0.05,
-              child: TextField(
+              child: TextFormField(
                 controller: nameController,
+                keyboardType: TextInputType.name,
+                textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(),
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  ),
+                  hintText: 'Nama Produk',
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14.0),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Nama produk harus diisi';
+                  }
+                  return null;
+                },
               ),
             ),
             SizedBox(height: size.height * 0.02),

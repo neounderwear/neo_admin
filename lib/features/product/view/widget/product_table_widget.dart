@@ -9,6 +9,7 @@ import 'package:neo_admin/constant/asset_manager.dart';
 import 'package:neo_admin/constant/color.dart';
 import 'package:neo_admin/constant/widget/alert_dialog.dart';
 import 'package:neo_admin/features/product/bloc/product_bloc.dart';
+import 'package:neo_admin/features/product/bloc/product_event.dart';
 import 'package:neo_admin/features/product/bloc/product_state.dart';
 
 // Widget untuk menampilkan daftar produk
@@ -21,6 +22,12 @@ class ProductTableWidget extends StatefulWidget {
 }
 
 class _ProductTableWidgetState extends State<ProductTableWidget> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProductBloc>().add(LoadProducts());
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProductBloc, ProductState>(
@@ -35,6 +42,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
         }
 
         if (state is ProductLoaded) {
+          print("Jumlah Produk: ${state.products.length}");
           if (state.products.isEmpty) {
             return const Center(
               child: Text('Kamu belum menambahkan produk. Tambah sekarang'),
@@ -54,7 +62,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
               headingRowColor: WidgetStateProperty.all(AppColor.secondaryColor),
               headingTextStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 18,
               ),
               columns: const <DataColumn>[
                 DataColumn(
@@ -91,7 +99,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              product['images'],
+                              product['image_url'] ?? '',
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
@@ -105,8 +113,12 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                         ],
                       ),
                     ),
-                    DataCell(Center(child: Text(product['price']))),
-                    DataCell(Center(child: Text(product['stock']))),
+                    DataCell(
+                      Center(child: Text(product['price']?.toString() ?? '0')),
+                    ),
+                    DataCell(
+                      Center(child: Text(product['stock']?.toString() ?? '0')),
+                    ),
                     DataCell(Center(child: Text('0'))),
                     DataCell(
                       Center(

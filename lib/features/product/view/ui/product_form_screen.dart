@@ -1,6 +1,3 @@
-import 'dart:typed_data';
-import 'package:dotted_border/dotted_border.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +7,8 @@ import 'package:neo_admin/features/product/bloc/product_bloc.dart';
 import 'package:neo_admin/features/product/bloc/product_event.dart';
 import 'package:neo_admin/features/product/bloc/product_state.dart';
 import 'package:neo_admin/features/product/data/product_service.dart';
+import 'package:neo_admin/features/product/view/widget/product_detail_section.dart';
+import 'package:neo_admin/features/product/view/widget/product_image_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Widget halaman untuk menambah/mengubah produk
@@ -22,6 +21,7 @@ class ProductFormScreen extends StatefulWidget {
 }
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
+  // Service
   final ProductService service = ProductService();
 
   // brands and categories
@@ -38,7 +38,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int? selectedCategory;
 
   // Image handling
-  Uint8List? imageBytes;
   String? imageUrl;
 
   // manajemen varian
@@ -53,16 +52,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (widget.product != null) {
       nameController.text = widget.product!['name'] ?? '';
       descController.text = widget.product!['description'] ?? '';
-      imageUrl = widget.product!['images'] ?? '';
+      imageUrl = widget.product!['image_url'] ?? '';
       selectedBrand = widget.product!['brand'];
       selectedCategory = widget.product!['category'];
-
-      // Load variants if editing
-      _loadProductVariants();
+      loadProductVariants();
     }
   }
 
-  void _loadProductVariants() {
+  void loadProductVariants() {
     if (widget.product == null) return;
 
     final bloc = context.read<ProductBloc>();
@@ -73,19 +70,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         variants = existingVariants;
       });
     }).catchError((e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error loading variants: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading variants: $e')),
+      );
     });
   }
 
   Future<void> loadBrandsCategories() async {
-    print("Fetching brands and categories...");
-
     final brandData = await service.fetchBrands();
     final categoryData = await service.fetchCategories();
-
-    print("Brands: $brandData");
-    print("Categories: $categoryData");
 
     if (brandData.isNotEmpty) {
       setState(() {
@@ -98,16 +91,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       setState(() {
         categories = categoryData;
         selectedCategory = categories.first['id'] ?? 0;
-      });
-    }
-  }
-
-  Future<void> pickImage() async {
-    final result = await FilePicker.platform
-        .pickFiles(type: FileType.image, withData: true);
-    if (result != null) {
-      setState(() {
-        imageBytes = result.files.single.bytes;
       });
     }
   }
@@ -186,175 +169,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               child: Column(
                 children: [
                   // Nama dan Deskripsi Produk
-                  Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18.0),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18.0,
-                        vertical: 24.0,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Form Nama Produk
-                          const FormLabel(label: 'Nama Produk'),
-                          SizedBox(height: size.height * 0.01),
-                          SizedBox(
-                            height: size.height * 0.05,
-                            child: TextFormField(
-                                controller: nameController,
-                                keyboardType: TextInputType.name,
-                                textInputAction: TextInputAction.next,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderSide: BorderSide(),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8.0)),
-                                  ),
-                                  hintText: 'Nama Produk',
-                                  hintStyle: TextStyle(
-                                      color: Colors.grey, fontSize: 14.0),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Nama produk harus diisi';
-                                  }
-                                  return null;
-                                }),
-                          ),
-                          SizedBox(height: size.height * 0.02),
-                          // Form Deskripsi Produk
-                          const FormLabel(label: 'Deskripsi Produk'),
-                          SizedBox(height: size.height * 0.01),
-                          TextFormField(
-                            controller: descController,
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 10,
-                            textInputAction: TextInputAction.newline,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide(),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8.0)),
-                              ),
-                              hintText: 'Deskripsi Produk',
-                              hintStyle:
-                                  TextStyle(color: Colors.grey, fontSize: 14.0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  ProductDetailSection(
+                    nameController: nameController,
+                    descController: descController,
                   ),
                   SizedBox(height: size.height * 0.02),
 
                   // Foto produk
-                  Container(
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18.0),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FormLabel(label: 'Foto Produk'),
-                          SizedBox(height: size.height * 0.01),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              DottedBorder(
-                                color: Colors.grey,
-                                strokeWidth: 1.0,
-                                dashPattern: const [3, 2],
-                                borderType: BorderType.RRect,
-                                radius: const Radius.circular(12.0),
-                                child: InkWell(
-                                  onTap: () {
-                                    pickImage();
-                                  },
-                                  child: Container(
-                                    width: size.height * 0.2,
-                                    height: size.height * 0.2,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white54,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(12.0),
-                                      ),
-                                    ),
-                                    child: imageBytes != null
-                                        ? ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(12.0),
-                                            child: imageBytes != null
-                                                ? Image.memory(imageBytes!,
-                                                    fit: BoxFit.cover)
-                                                : (imageUrl != null &&
-                                                        imageUrl!.isNotEmpty)
-                                                    ? Image.network(imageUrl!,
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder: (context,
-                                                                error,
-                                                                stackTrace) =>
-                                                            Icon(Icons
-                                                                .error_outline))
-                                                    : Icon(Icons
-                                                        .add_photo_alternate_rounded),
-                                          )
-                                        : (imageUrl != null &&
-                                                imageUrl!.isNotEmpty)
-                                            ? ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(12.0),
-                                                child: Image.network(
-                                                  imageUrl!,
-                                                  fit: BoxFit.cover,
-                                                  loadingBuilder: (context,
-                                                      child, loadingProgress) {
-                                                    if (loadingProgress ==
-                                                        null) {
-                                                      return child;
-                                                    }
-                                                    return Center(
-                                                      child:
-                                                          CircularProgressIndicator(),
-                                                    );
-                                                  },
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Center(
-                                                      child: Icon(
-                                                          Icons.error_outline),
-                                                    );
-                                                  },
-                                                ))
-                                            : const Center(
-                                                child: Icon(
-                                                  Icons
-                                                      .add_photo_alternate_rounded,
-                                                  size: 48.0,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
+                  ProductImageWidget(),
                   SizedBox(height: size.height * 0.02),
 
                   // Varian produk

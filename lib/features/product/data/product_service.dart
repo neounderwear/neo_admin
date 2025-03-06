@@ -12,8 +12,8 @@ class ProductService {
   Future<List<Map<String, dynamic>>> fetchProducts() async {
     final response = await supabase
         .from('products')
-        .select('*')
-        .order('created_at', ascending: false);
+        .select('id, name, image_url, product_variants(price, stock)')
+        .order('id', ascending: true);
     return response;
   }
 
@@ -120,10 +120,8 @@ class ProductService {
           'Authorization': 'Bearer ${SupabaseHelper().anonKey}',
         }),
       );
-      print('API Response Brands: ${response.data}');
       return List<Map<String, dynamic>>.from(response.data);
     } catch (e) {
-      print('Error fetching brands: $e');
       return [];
     }
   }
@@ -138,10 +136,8 @@ class ProductService {
           'Authorization': 'Bearer ${SupabaseHelper().anonKey}',
         }),
       );
-      print('API Response Categories: ${response.data}');
       return List<Map<String, dynamic>>.from(response.data);
     } catch (e) {
-      print('Error fetching categories: $e');
       return [];
     }
   }

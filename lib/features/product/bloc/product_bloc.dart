@@ -93,7 +93,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         final productData = {
           'name': event.name,
           'description': event.description,
-          'images': event.imageUrl ?? imageUrl,
+          'image_url': event.imageUrl ?? imageUrl,
         };
 
         // Check if it's an update or new product
