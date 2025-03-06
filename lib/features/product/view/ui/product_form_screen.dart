@@ -9,6 +9,8 @@ import 'package:neo_admin/constant/widget/form_label.dart';
 import 'package:neo_admin/features/product/bloc/product_bloc.dart';
 import 'package:neo_admin/features/product/bloc/product_event.dart';
 import 'package:neo_admin/features/product/bloc/product_state.dart';
+import 'package:neo_admin/features/product/data/product_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Widget halaman untuk menambah/mengubah produk
 class ProductFormScreen extends StatefulWidget {
@@ -20,9 +22,11 @@ class ProductFormScreen extends StatefulWidget {
 }
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
-  //
-  List<String> brands = [];
-  List<String> categories = [];
+  final ProductService service = ProductService();
+
+  // brands and categories
+  List<Map<String, dynamic>> brands = [];
+  List<Map<String, dynamic>> categories = [];
 
   // Controller
   final _formKey = GlobalKey<FormState>();
@@ -30,8 +34,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final descController = TextEditingController();
 
   // Nilai dropdown
-  String? selectedBrand;
-  String? selectedCategory;
+  int? selectedBrand;
+  int? selectedCategory;
 
   // Image handling
   Uint8List? imageBytes;
@@ -40,15 +44,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   // manajemen varian
   List<Map<String, dynamic>> variants = [];
 
+  final supabase = Supabase.instance.client;
+
   @override
   void initState() {
     super.initState();
-    final bloc = context.read<ProductBloc>();
-    bloc.add(LoadBrands());
-    bloc.add(LoadCategories());
-    print('Jumlah Brands: ${brands.length}');
-    print('Jumlah Categories: ${categories.length}');
-
+    loadBrandsCategories();
     if (widget.product != null) {
       nameController.text = widget.product!['name'] ?? '';
       descController.text = widget.product!['description'] ?? '';
@@ -58,9 +59,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
       // Load variants if editing
       _loadProductVariants();
-
-      print('Jumlah Brands: ${brands.length}');
-      print('Jumlah Categories: ${categories.length}');
     }
   }
 
@@ -78,6 +76,30 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Error loading variants: $e')));
     });
+  }
+
+  Future<void> loadBrandsCategories() async {
+    print("Fetching brands and categories...");
+
+    final brandData = await service.fetchBrands();
+    final categoryData = await service.fetchCategories();
+
+    print("Brands: $brandData");
+    print("Categories: $categoryData");
+
+    if (brandData.isNotEmpty) {
+      setState(() {
+        brands = brandData;
+        selectedBrand = brands.first['id'] ?? 0;
+      });
+    }
+
+    if (categoryData.isNotEmpty) {
+      setState(() {
+        categories = categoryData;
+        selectedCategory = categories.first['id'] ?? 0;
+      });
+    }
   }
 
   Future<void> pickImage() async {
@@ -111,15 +133,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // Prepare submission
       final bloc = context.read<ProductBloc>();
       bloc.add(SubmitProductForm(
         productId: widget.product?['id'],
         name: nameController.text,
         description: descController.text,
         imageUrl: imageUrl,
-        brand: selectedBrand,
-        category: selectedCategory,
         variants: variants,
       ));
     }
@@ -139,31 +158,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     return BlocListener<ProductBloc, ProductState>(
       listener: (context, state) {
         if (state is ImageUploadSuccess) {
-          // Update image URL when image is uploaded
           setState(() {
             imageUrl = state.imageUrl;
           });
         } else if (state is ProductSubmissionSuccess) {
-          // Navigate back to product list
           context.go('/main/product');
         } else if (state is ProductError) {
-          // Show error message
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.message)));
-        } else if (state is BrandsLoaded) {
-          print('Brands loaded: ${state.brands}');
-          setState(() {
-            brands = state.brands
-                .map((brand) => brand['brand_name'] as String)
-                .toList();
-          });
-        } else if (state is CategoriesLoaded) {
-          print('Categories loaded: ${state.categories}');
-          setState(() {
-            categories = state.categories
-                .map((category) => category['category_name'] as String)
-                .toList();
-          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message)),
+          );
         }
       },
       child: Scaffold(
@@ -524,29 +527,31 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                 // Merek Produk
                                 const FormLabel(label: 'Merek Produk'),
                                 SizedBox(height: size.height * 0.01),
-                                DropdownButtonFormField<String>(
-                                  value: selectedBrand,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 0),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    hintText: 'Pilih Merek',
-                                  ),
-                                  items: brands.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value,
-                                          overflow: TextOverflow.ellipsis),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      selectedBrand = newValue;
-                                    });
-                                  },
-                                ),
+                                brands.isEmpty
+                                    ? CircularProgressIndicator()
+                                    : DropdownButtonFormField<int>(
+                                        value: selectedBrand,
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 0),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          hintText: 'Pilih Merek',
+                                        ),
+                                        items: brands.map((brand) {
+                                          return DropdownMenuItem<int>(
+                                            value: brand['id'],
+                                            child: Text(brand['brand_name']),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedBrand = value;
+                                          });
+                                        },
+                                      ),
                               ],
                             ),
                           ),
@@ -574,31 +579,32 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                               children: [
                                 const FormLabel(label: 'Kategori Produk'),
                                 SizedBox(height: size.height * 0.01),
-                                DropdownButtonFormField<String>(
-                                  isExpanded:
-                                      true, // Important for handling width
-                                  value: selectedCategory,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 0),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    hintText: 'Pilih Kategori',
-                                  ),
-                                  items: categories.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value,
-                                          overflow: TextOverflow.ellipsis),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      selectedCategory = newValue;
-                                    });
-                                  },
-                                ),
+                                categories.isEmpty
+                                    ? CircularProgressIndicator()
+                                    : DropdownButtonFormField<int>(
+                                        value: selectedCategory,
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 0),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          hintText: 'Pilih Kategori',
+                                        ),
+                                        items: categories.map((categories) {
+                                          return DropdownMenuItem<int>(
+                                            value: categories['id'],
+                                            child: Text(
+                                                categories['category_name']),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedCategory = value;
+                                          });
+                                        },
+                                      ),
                               ],
                             ),
                           ),

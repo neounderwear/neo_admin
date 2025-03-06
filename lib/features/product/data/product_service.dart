@@ -1,9 +1,12 @@
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
+import 'package:neo_admin/app/supabase_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
   final supabase = Supabase.instance.client;
+  final Dio dio = Dio();
 
   // fetch produk
   Future<List<Map<String, dynamic>>> fetchProducts() async {
@@ -107,21 +110,38 @@ class ProductService {
     }
   }
 
-  // Contoh pengambilan data di service
+  // Fetch Brands
   Future<List<Map<String, dynamic>>> fetchBrands() async {
-    final response = await supabase.from('brands').select('brand_name');
-    return response;
-  }
-
-  Future<List<Map<String, dynamic>>> fetchCategories() async {
     try {
-      final response =
-          await supabase.from('categories').select('category_name');
-
-      print('Brands from Supabase: $response');
-      return response;
+      final response = await dio.get(
+        '${SupabaseHelper().url}/rest/v1/brands',
+        options: Options(headers: {
+          'apiKey': SupabaseHelper().anonKey,
+          'Authorization': 'Bearer ${SupabaseHelper().anonKey}',
+        }),
+      );
+      print('API Response Brands: ${response.data}');
+      return List<Map<String, dynamic>>.from(response.data);
     } catch (e) {
       print('Error fetching brands: $e');
+      return [];
+    }
+  }
+
+  // Fetch Categories
+  Future<List<Map<String, dynamic>>> fetchCategories() async {
+    try {
+      final response = await dio.get(
+        '${SupabaseHelper().url}/rest/v1/categories',
+        options: Options(headers: {
+          'apiKey': SupabaseHelper().anonKey,
+          'Authorization': 'Bearer ${SupabaseHelper().anonKey}',
+        }),
+      );
+      print('API Response Categories: ${response.data}');
+      return List<Map<String, dynamic>>.from(response.data);
+    } catch (e) {
+      print('Error fetching categories: $e');
       return [];
     }
   }

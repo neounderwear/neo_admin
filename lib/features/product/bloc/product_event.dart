@@ -43,8 +43,8 @@ class SubmitProductForm extends ProductEvent {
   final String name;
   final String description;
   final String? imageUrl;
-  final String? brand;
-  final String? category;
+  final int? brandId;
+  final int? categoryId;
   final List<Map<String, dynamic>> variants;
 
   SubmitProductForm({
@@ -52,8 +52,8 @@ class SubmitProductForm extends ProductEvent {
     required this.name,
     required this.description,
     this.imageUrl,
-    this.brand,
-    this.category,
+    this.brandId,
+    this.categoryId,
     this.variants = const [],
   });
 }

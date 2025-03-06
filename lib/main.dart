@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neo_admin/app/main_screen.dart';
+import 'package:neo_admin/app/supabase_helper.dart';
 import 'package:neo_admin/constant/theme.dart';
 import 'package:neo_admin/features/banner/bloc/banner_bloc.dart';
 import 'package:neo_admin/features/banner/data/banner_service.dart';
@@ -27,9 +28,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: 'https://wovklugpxmjwinfeaded.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvdmtsdWdweG1qd2luZmVhZGVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAyMDQ2MzIsImV4cCI6MjA1NTc4MDYzMn0.EvYq1oi4tnF4Ix19ZBV4RGaKVsl1lli8hXb1VXcVXFI',
+    url: SupabaseHelper().url,
+    anonKey: SupabaseHelper().anonKey,
   );
   runApp(MyApp());
 }

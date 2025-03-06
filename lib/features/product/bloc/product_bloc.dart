@@ -94,8 +94,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           'name': event.name,
           'description': event.description,
           'images': event.imageUrl ?? imageUrl,
-          'brand': event.brand,
-          'category': event.category,
         };
 
         // Check if it's an update or new product
@@ -120,35 +118,5 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(ProductError(e.toString()));
       }
     });
-
-    on<LoadBrands>((event, emit) async {
-      try {
-        final brands = await productService.fetchBrands();
-        emit(BrandsLoaded(brands));
-      } catch (e) {
-        emit(BrandsError(e.toString()));
-      }
-    });
-
-    // Load Categories
-    on<LoadCategories>((event, emit) async {
-      try {
-        categories = await productService.fetchCategories();
-        emit(CategoriesLoaded(categories));
-      } catch (e) {
-        emit(CategoriesError(e.toString()));
-      }
-    });
-  }
-
-  // Optional method to get brand/category names easily
-  List<String> getBrandNames() {
-    return brands.map((brand) => brand['brand_name'] as String).toList();
-  }
-
-  List<String> getCategoryNames() {
-    return categories
-        .map((category) => category['category_name'] as String)
-        .toList();
   }
 }
