@@ -109,15 +109,8 @@ class ProductService {
 
   // Contoh pengambilan data di service
   Future<List<Map<String, dynamic>>> fetchBrands() async {
-    try {
-      final response = await supabase.from('brands').select('brand_name');
-
-      print('Brands from Supabase: $response');
-      return response;
-    } catch (e) {
-      print('Error fetching brands: $e');
-      return [];
-    }
+    final response = await supabase.from('brands').select('brand_name');
+    return response;
   }
 
   Future<List<Map<String, dynamic>>> fetchCategories() async {

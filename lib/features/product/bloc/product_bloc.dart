@@ -93,7 +93,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         final productData = {
           'name': event.name,
           'description': event.description,
-          'images': event.imageUrl ?? imageUrl, // Use class-level imageUrl
+          'images': event.imageUrl ?? imageUrl,
           'brand': event.brand,
           'category': event.category,
         };
@@ -123,7 +123,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
     on<LoadBrands>((event, emit) async {
       try {
-        brands = await productService.fetchBrands();
+        final brands = await productService.fetchBrands();
         emit(BrandsLoaded(brands));
       } catch (e) {
         emit(BrandsError(e.toString()));
@@ -143,10 +143,12 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   // Optional method to get brand/category names easily
   List<String> getBrandNames() {
-    return brands.map((brand) => brand['name'] as String).toList();
+    return brands.map((brand) => brand['brand_name'] as String).toList();
   }
 
   List<String> getCategoryNames() {
-    return categories.map((category) => category['name'] as String).toList();
+    return categories
+        .map((category) => category['category_name'] as String)
+        .toList();
   }
 }

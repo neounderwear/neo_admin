@@ -43,6 +43,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   @override
   void initState() {
     super.initState();
+    final bloc = context.read<ProductBloc>();
+    bloc.add(LoadBrands());
+    bloc.add(LoadCategories());
+    print('Jumlah Brands: ${brands.length}');
+    print('Jumlah Categories: ${categories.length}');
+
     if (widget.product != null) {
       nameController.text = widget.product!['name'] ?? '';
       descController.text = widget.product!['description'] ?? '';
@@ -53,9 +59,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       // Load variants if editing
       _loadProductVariants();
 
-      final bloc = context.read<ProductBloc>();
-      bloc.add(LoadBrands());
-      bloc.add(LoadCategories());
+      print('Jumlah Brands: ${brands.length}');
+      print('Jumlah Categories: ${categories.length}');
     }
   }
 
@@ -146,12 +151,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(state.message)));
         } else if (state is BrandsLoaded) {
+          print('Brands loaded: ${state.brands}');
           setState(() {
             brands = state.brands
                 .map((brand) => brand['brand_name'] as String)
                 .toList();
           });
         } else if (state is CategoriesLoaded) {
+          print('Categories loaded: ${state.categories}');
           setState(() {
             categories = state.categories
                 .map((category) => category['category_name'] as String)
@@ -518,8 +525,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                 const FormLabel(label: 'Merek Produk'),
                                 SizedBox(height: size.height * 0.01),
                                 DropdownButtonFormField<String>(
-                                  isExpanded:
-                                      true, // Important for handling width
                                   value: selectedBrand,
                                   decoration: InputDecoration(
                                     contentPadding: EdgeInsets.symmetric(
@@ -540,12 +545,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                     setState(() {
                                       selectedBrand = newValue;
                                     });
-                                  },
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return 'Pilih merek produk';
-                                    }
-                                    return null;
                                   },
                                 ),
                               ],
@@ -598,12 +597,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                     setState(() {
                                       selectedCategory = newValue;
                                     });
-                                  },
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return 'Pilih kategori produk';
-                                    }
-                                    return null;
                                   },
                                 ),
                               ],
