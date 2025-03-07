@@ -22,7 +22,7 @@ class ProductFormScreen extends StatefulWidget {
 
 class _ProductFormScreenState extends State<ProductFormScreen> {
   // Service
-  final ProductService service = ProductService();
+  // final ProductService service = ProductService();
 
   // brands and categories
   List<Map<String, dynamic>> brands = [];
@@ -55,30 +55,30 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       imageUrl = widget.product!['image_url'] ?? '';
       selectedBrand = widget.product!['brand'];
       selectedCategory = widget.product!['category'];
-      loadProductVariants();
+      // loadProductVariants();
     }
   }
 
-  void loadProductVariants() {
-    if (widget.product == null) return;
+  // void loadProductVariants() {
+  //   if (widget.product == null) return;
 
-    final bloc = context.read<ProductBloc>();
-    bloc.productService
-        .fetchVariants(widget.product!['id'])
-        .then((existingVariants) {
-      setState(() {
-        variants = existingVariants;
-      });
-    }).catchError((e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading variants: $e')),
-      );
-    });
-  }
+  //   final bloc = context.read<ProductBloc>();
+  //   bloc.productService
+  //       .fetchVariants(widget.product!['id'])
+  //       .then((existingVariants) {
+  //     setState(() {
+  //       variants = existingVariants;
+  //     });
+  //   }).catchError((e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error loading variants: $e')),
+  //     );
+  //   });
+  // }
 
   Future<void> loadBrandsCategories() async {
-    final brandData = await service.fetchBrands();
-    final categoryData = await service.fetchCategories();
+    // final brandData = await service.fetchBrands();
+    // final categoryData = await service.fetchCategories();
 
     if (brandData.isNotEmpty) {
       setState(() {
@@ -256,12 +256,31 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                             onChanged: (value) {
                                               setState(() {
                                                 variants[index]['price'] =
-                                                    double.tryParse(value) ?? 0;
+                                                    double.tryParse(value);
                                               });
                                             },
                                           ),
                                         ),
                                         SizedBox(width: size.width * 0.01),
+                                        Expanded(
+                                          child: TextFormField(
+                                            initialValue:
+                                                variant['discount_price']
+                                                    .toString(),
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              labelText: 'Harga Diskon',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                variants[index]
+                                                        ['discount_price'] =
+                                                    double.tryParse(value);
+                                              });
+                                            },
+                                          ),
+                                        ),
                                         Expanded(
                                           child: TextFormField(
                                             initialValue:
@@ -276,7 +295,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                               setState(() {
                                                 variants[index]
                                                         ['reseller_price'] =
-                                                    double.tryParse(value) ?? 0;
+                                                    double.tryParse(value);
                                               });
                                             },
                                           ),
@@ -294,7 +313,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                             onChanged: (value) {
                                               setState(() {
                                                 variants[index]['stock'] =
-                                                    double.tryParse(value) ?? 0;
+                                                    double.tryParse(value);
                                               });
                                             },
                                           ),
@@ -312,7 +331,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                             onChanged: (value) {
                                               setState(() {
                                                 variants[index]['weight'] =
-                                                    double.tryParse(value) ?? 0;
+                                                    double.tryParse(value);
                                               });
                                             },
                                           ),

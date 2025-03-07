@@ -11,6 +11,24 @@ class ProductLoaded extends ProductState {
   ProductLoaded(this.products);
 }
 
+class BrandsLoaded extends ProductState {
+  final List<Map<String, dynamic>> brands;
+
+  BrandsLoaded(this.brands);
+}
+
+class CategoriesLoaded extends ProductState {
+  final List<Map<String, dynamic>> categories;
+
+  CategoriesLoaded(this.categories);
+}
+
+class ProductSuccess extends ProductState {
+  final String message;
+
+  ProductSuccess(this.message);
+}
+
 class ProductError extends ProductState {
   final String message;
 

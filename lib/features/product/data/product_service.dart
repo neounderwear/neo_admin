@@ -1,47 +1,161 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:neo_admin/app/supabase_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
-  final supabase = Supabase.instance.client;
+  final SupabaseClient supabase;
   final Dio dio = Dio();
 
-  // Fungsi untuk fetch data produk dari tabel products
+  ProductService(this.supabase);
+
+  // Fungsi untuk fetch semua produk dari tabel products
   Future<List<Map<String, dynamic>>> fetchProducts() async {
     final response = await supabase
         .from('products')
-        .select('id, name, image_url, product_variants(price, stock)')
-        .order('id', ascending: true);
+        .select(
+          '*, brands(id, brand_name),categories(id, category_name),product_variants(*)',
+        )
+        .order('created_at', ascending: false);
     return response;
   }
 
-  // Fungsi untuk fetch varian produk berdasarkan id
-  Future<List<Map<String, dynamic>>> fetchVariants(String productId) async {
+  // Fungsi untuk fetch single produk dengan variannya
+  Future<Map<String, dynamic>> fetchProductById(int productId) async {
     final response = await supabase
-        .from('product_variants')
-        .select('*')
-        .eq('product_id', productId);
+        .from('products')
+        .select(
+          '*, brands(id, brand_name),categories(id, category_name),product_variants(*)',
+        )
+        .eq('id', productId)
+        .single();
     return response;
   }
 
-  // Fungsi untuk menambah produk ke tabel products
-  Future<void> addProducts(Map<String, dynamic> productData) async {
-    await supabase.from('products').insert(productData);
+  // Fungsi untuk menambah produk dan varian ke tabel products
+  Future<Map<String, dynamic>> addProduct({
+    required String name,
+    String? description,
+    required int brandId,
+    required int categoryId,
+    required String imageUrl,
+    required List<Map<String, dynamic>> variants,
+  }) async {
+    try {
+      final productResponse = await supabase
+          .from('products')
+          .insert({
+            'name': name,
+            'description': description,
+            'brand_id': brandId,
+            'category_id': categoryId,
+            'image_url': imageUrl
+          })
+          .select()
+          .single();
+
+      final productId = productResponse['id'];
+
+      if (variants.isNotEmpty) {
+        for (var variant in variants) {
+          await supabase.from('product_variants').insert({
+            'product_id': productId,
+            'name': variant['name'],
+            'price': variant['price'],
+            'discount_price': variant['discount_product'],
+            'reseller_price': variant['reseller_price'],
+            'sku': variant['sku'],
+            'stock': variant['stock'],
+            'weight': variant['weight'],
+          });
+        }
+      }
+      return fetchProductById(productId);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // Fungsi untuk mengubah produk di tabel products
-  Future<void> updateProducts(
-    String productId,
-    Map<String, dynamic> productData,
-  ) async {
-    await supabase.from('products').update(productData).eq('id', productId);
+  Future<Map<String, dynamic>> updateProduct({
+    required int productId,
+    required String name,
+    String? description,
+    required int brandId,
+    required int categoryId,
+    required String imageUrl,
+    required List<Map<String, dynamic>> variants,
+  }) async {
+    try {
+      await supabase.from('products').update({
+        'name': name,
+        'description': description,
+        'brand_id': brandId,
+        'category_id': categoryId,
+        'image_url': imageUrl,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', productId);
+
+      final existingVariants = await supabase
+          .from('product_variants')
+          .select('id')
+          .eq('product_id', productId);
+
+      final existingVariantIds = existingVariants.map((v) => v['id']).toList();
+      final updatedVariantIds = variants
+          .where((v) => v.containsKey('id'))
+          .map((v) => v['id'])
+          .toList();
+
+      // Menghapus varian yang tidak ada lagi
+      for (var variantId in existingVariantIds) {
+        if (!updatedVariantIds.contains(variantId)) {
+          await supabase.from('product_variants').delete().eq('id', variantId);
+        }
+      }
+
+      // Memperbarui atau menambah varian
+      for (var variant in variants) {
+        if (variant.containsKey('id')) {
+          // Update varian yang sudah ada
+          await supabase.from('product_variants').update({
+            'name': variant['name'],
+            'price': variant['price'],
+            'discount_price': variant['discount_price'],
+            'reseller_price': variant['reseller_price'],
+            'sku': variant['sku'],
+            'stock': variant['stock'],
+            'weight': variant['weight'],
+            'updated_at': DateTime.now().toIso8601String(),
+          }).eq('id', variant['id']);
+        } else {
+          // Membuat varian baru
+          await supabase.from('product_variants').insert({
+            'product_id': productId,
+            'name': variant['name'],
+            'price': variant['price'],
+            'discount_price': variant['discount_price'],
+            'reseller_price': variant['reseller_price'],
+            'sku': variant['sku'],
+            'stock': variant['stock'],
+            'weight': variant['weight'],
+          });
+        }
+      }
+
+      return await fetchProductById(productId);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // Fungsi untuk menghapus produk dari tabel products
-  Future<void> deleteProducts(String productId) async {
+  Future<void> deleteProduct(int productId) async {
     await supabase.from('products').delete().eq('id', productId);
+    await supabase
+        .from('product_variants')
+        .delete()
+        .eq('product_id', productId);
   }
 
   // Fungsi untuk mengupload gambar ke storage product-images
@@ -53,94 +167,16 @@ class ProductService {
     return supabase.storage.from('product-images').getPublicUrl(fileName);
   }
 
-  // Fungsi untuk mengupload produk dengan varian
-  Future<String> addProductWithVariants(Map<String, dynamic> productData,
-      List<Map<String, dynamic>> variants) async {
-    try {
-      final response = await supabase
-          .from('products')
-          .insert(productData)
-          .select('id')
-          .single();
-
-      final productId = response['id'];
-
-      // Add variants with product ID
-      final variantsWithProductId = variants.map((variant) {
-        return {
-          ...variant,
-          'product_id': productId,
-        };
-      }).toList();
-
-      // Insert variants
-      await supabase.from('product_variants').insert(variantsWithProductId);
-
-      return productId;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // Update product with variants
-  Future<void> updateProductWithVariants(
-      String productId,
-      Map<String, dynamic> productData,
-      List<Map<String, dynamic>> variants) async {
-    try {
-      // Update product
-      await supabase.from('products').update(productData).eq('id', productId);
-
-      // Delete existing variants
-      await supabase
-          .from('product_variants')
-          .delete()
-          .eq('product_id', productId);
-
-      // Add new variants
-      final variantsWithProductId = variants.map((variant) {
-        return {
-          ...variant,
-          'product_id': productId,
-        };
-      }).toList();
-
-      // Insert new variants
-      await supabase.from('product_variants').insert(variantsWithProductId);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // Fetch Brands
+  // Fungsi untuk fetch data merek dari tabel brands
   Future<List<Map<String, dynamic>>> fetchBrands() async {
-    try {
-      final response = await dio.get(
-        '${SupabaseHelper().url}/rest/v1/brands',
-        options: Options(headers: {
-          'apiKey': SupabaseHelper().anonKey,
-          'Authorization': 'Bearer ${SupabaseHelper().anonKey}',
-        }),
-      );
-      return List<Map<String, dynamic>>.from(response.data);
-    } catch (e) {
-      return [];
-    }
+    final response = await supabase.from('brands').select('*').order('name');
+    return response;
   }
 
-  // Fetch Categories
+  // Fungsi untuk fetch data merek dari tabel brands
   Future<List<Map<String, dynamic>>> fetchCategories() async {
-    try {
-      final response = await dio.get(
-        '${SupabaseHelper().url}/rest/v1/categories',
-        options: Options(headers: {
-          'apiKey': SupabaseHelper().anonKey,
-          'Authorization': 'Bearer ${SupabaseHelper().anonKey}',
-        }),
-      );
-      return List<Map<String, dynamic>>.from(response.data);
-    } catch (e) {
-      return [];
-    }
+    final response =
+        await supabase.from('categories').select('*').order('name');
+    return response;
   }
 }

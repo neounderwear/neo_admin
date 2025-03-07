@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:typed_data';
 
 abstract class ProductEvent {}
@@ -6,23 +7,54 @@ abstract class ProductEvent {}
 class LoadProducts extends ProductEvent {}
 
 class AddProducts extends ProductEvent {
-  final Map<String, dynamic> productData;
+  final String name;
+  final String? description;
+  final int brandId;
+  final int categoryId;
+  final String imageUrl;
+  final List<Map<String, dynamic>> variants;
 
-  AddProducts(this.productData);
+  AddProducts({
+    required this.name,
+    this.description,
+    required this.brandId,
+    required this.categoryId,
+    required this.imageUrl,
+    required this.variants,
+  });
 }
 
 class UpdateProducts extends ProductEvent {
-  final String productId;
-  final Map<String, dynamic> productData;
+  final int productId;
+  final String name;
+  final String? description;
+  final int brandId;
+  final int categoryId;
+  final String imageUrl;
+  final List<Map<String, dynamic>> variants;
+  final List<int> variantsToDelete;
 
-  UpdateProducts(this.productId, this.productData);
+  UpdateProducts({
+    required this.productId,
+    required this.name,
+    this.description,
+    required this.brandId,
+    required this.categoryId,
+    required this.imageUrl,
+    required this.variants,
+    required this.variantsToDelete,
+  });
 }
 
 class DeleteProducts extends ProductEvent {
-  final String productId;
+  final int productId;
 
   DeleteProducts(this.productId);
 }
+
+class LoadBrands extends ProductEvent {}
+
+class LoadCategories extends ProductEvent {}
 
 // Varian produk
 class AddVariantRow extends ProductEvent {}
