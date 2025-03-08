@@ -1,12 +1,8 @@
-import 'package:delightful_toast/delight_toast.dart';
-import 'package:delightful_toast/toast/components/toast_card.dart';
-import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:neo_admin/constant/asset_manager.dart';
 import 'package:neo_admin/features/banner/bloc/banner_bloc.dart';
 import 'package:neo_admin/features/banner/bloc/banner_event.dart';
 
@@ -48,33 +44,33 @@ class _BannerFormWidgetState extends State<BannerFormWidget> {
   // Fungsi untuk mengirim data
   void submit() {
     if (selectedPage == null) {
-      DelightToastBar(
-        builder: (context) {
-          return ToastCard(
-            leading: Image.asset(AssetManager.warningIcon),
-            title: Text('Silakan pilih halaman untuk banner'),
-            color: Color(0xFFD9C7B3),
-          );
-        },
-        autoDismiss: true,
-        position: DelightSnackbarPosition.top,
-      ).show(context);
-      return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Silakan pilih halaman untuk banner',
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.yellow,
+          width: 300.0,
+        ),
+      );
     }
 
     if (widget.banner == null && imageBytes == null) {
-      DelightToastBar(
-        builder: (context) {
-          return ToastCard(
-            leading: Image.asset(AssetManager.warningIcon),
-            title: Text('Banner tidak boleh kosong'),
-            color: Color(0xFFD9C7B3),
-          );
-        },
-        autoDismiss: true,
-        position: DelightSnackbarPosition.top,
-      ).show(context);
-      return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Banner tidak boleh kosong',
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.yellow,
+          width: 300.0,
+        ),
+      );
     }
 
     final bloc = context.read<BannerBloc>();
@@ -95,17 +91,18 @@ class _BannerFormWidgetState extends State<BannerFormWidget> {
       }
       Navigator.of(context).pop();
     } catch (e) {
-      DelightToastBar(
-        builder: (context) {
-          return ToastCard(
-            leading: Image.asset(AssetManager.failedIcon),
-            title: Text('Error: ${e.toString()}'),
-            color: Color(0xFFD9C7B3),
-          );
-        },
-        autoDismiss: true,
-        position: DelightSnackbarPosition.top,
-      ).show(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error: ${e.toString()}',
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+          width: 300.0,
+        ),
+      );
     }
   }
 
@@ -250,21 +247,20 @@ class _BannerFormWidgetState extends State<BannerFormWidget> {
                     child: ElevatedButton(
                       onPressed: () {
                         submit();
-                        DelightToastBar(
-                          builder: (context) {
-                            return ToastCard(
-                              leading: Image.asset(AssetManager.successIcon),
-                              title: Text(
-                                widget.banner == null
-                                    ? 'Berhasil upload merek'
-                                    : 'Berhasil menyimpan',
-                              ),
-                              color: Color(0xFFD9C7B3),
-                            );
-                          },
-                          autoDismiss: true,
-                          position: DelightSnackbarPosition.top,
-                        ).show(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              widget.banner == null
+                                  ? 'Berhasil upload merek'
+                                  : 'Berhasil menyimpan',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.green,
+                            width: 300.0,
+                          ),
+                        );
                       },
                       child: Text(widget.banner == null ? 'Tambah' : 'Simpan'),
                     ),
