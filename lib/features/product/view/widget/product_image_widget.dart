@@ -5,7 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:neo_admin/constant/widget/form_label.dart';
 
 class ProductImageWidget extends StatefulWidget {
-  const ProductImageWidget({super.key});
+  final String? initialImageUrl;
+  final Function(Uint8List?) onImageSelected;
+
+  const ProductImageWidget({
+    super.key,
+    this.initialImageUrl,
+    required this.onImageSelected,
+  });
 
   @override
   State<ProductImageWidget> createState() => _ProductImageWidgetState();
@@ -22,6 +29,8 @@ class _ProductImageWidgetState extends State<ProductImageWidget> {
       setState(() {
         imageBytes = result.files.single.bytes;
       });
+      // Call the callback to notify parent component
+      widget.onImageSelected(imageBytes);
     }
   }
 

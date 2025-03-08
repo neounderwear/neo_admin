@@ -66,6 +66,7 @@ class ProductDetailSection extends StatelessWidget {
               controller: descController,
               keyboardType: TextInputType.multiline,
               maxLines: 10,
+              maxLength: 2000,
               textInputAction: TextInputAction.newline,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(
@@ -75,6 +76,12 @@ class ProductDetailSection extends StatelessWidget {
                 hintText: 'Deskripsi Produk',
                 hintStyle: TextStyle(color: Colors.grey, fontSize: 14.0),
               ),
+              validator: (value) {
+                if (value != null && value.length > 2000) {
+                  return 'Deskripsi maksimal 2000 karakter';
+                }
+                return null;
+              },
             ),
           ],
         ),

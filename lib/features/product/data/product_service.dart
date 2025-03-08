@@ -1,11 +1,8 @@
 import 'dart:typed_data';
-
-import 'package:dio/dio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductService {
   final SupabaseClient supabase;
-  final Dio dio = Dio();
 
   ProductService(this.supabase);
 
@@ -35,7 +32,7 @@ class ProductService {
   // Fungsi untuk menambah produk dan varian ke tabel products
   Future<Map<String, dynamic>> addProduct({
     required String name,
-    String? description,
+    required String description,
     required int brandId,
     required int categoryId,
     required String imageUrl,
@@ -62,7 +59,7 @@ class ProductService {
             'product_id': productId,
             'name': variant['name'],
             'price': variant['price'],
-            'discount_price': variant['discount_product'],
+            'discount_price': variant['discount_price'],
             'reseller_price': variant['reseller_price'],
             'sku': variant['sku'],
             'stock': variant['stock'],
@@ -151,11 +148,11 @@ class ProductService {
 
   // Fungsi untuk menghapus produk dari tabel products
   Future<void> deleteProduct(int productId) async {
-    await supabase.from('products').delete().eq('id', productId);
     await supabase
         .from('product_variants')
         .delete()
         .eq('product_id', productId);
+    await supabase.from('products').delete().eq('id', productId);
   }
 
   // Fungsi untuk mengupload gambar ke storage product-images
@@ -169,14 +166,15 @@ class ProductService {
 
   // Fungsi untuk fetch data merek dari tabel brands
   Future<List<Map<String, dynamic>>> fetchBrands() async {
-    final response = await supabase.from('brands').select('*').order('name');
+    final response =
+        await supabase.from('brands').select('*').order('brand_name');
     return response;
   }
 
   // Fungsi untuk fetch data merek dari tabel brands
   Future<List<Map<String, dynamic>>> fetchCategories() async {
     final response =
-        await supabase.from('categories').select('*').order('name');
+        await supabase.from('categories').select('*').order('category_name');
     return response;
   }
 }

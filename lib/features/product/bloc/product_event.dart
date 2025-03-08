@@ -32,7 +32,7 @@ class UpdateProducts extends ProductEvent {
   final int categoryId;
   final String imageUrl;
   final List<Map<String, dynamic>> variants;
-  final List<int> variantsToDelete;
+  final List<int>? variantsToDelete;
 
   UpdateProducts({
     required this.productId,
@@ -42,7 +42,7 @@ class UpdateProducts extends ProductEvent {
     required this.categoryId,
     required this.imageUrl,
     required this.variants,
-    required this.variantsToDelete,
+    this.variantsToDelete,
   });
 }
 
@@ -56,36 +56,8 @@ class LoadBrands extends ProductEvent {}
 
 class LoadCategories extends ProductEvent {}
 
-// Varian produk
-class AddVariantRow extends ProductEvent {}
-
-class RemoveVariantRow extends ProductEvent {
-  final int index;
-
-  RemoveVariantRow(this.index);
-}
-
-class UploadProductImage extends ProductEvent {
+class UploadProductImageEvent extends ProductEvent {
   final Uint8List imageBytes;
-  UploadProductImage(this.imageBytes);
-}
 
-class SubmitProductForm extends ProductEvent {
-  final String? productId;
-  final String name;
-  final String description;
-  final String? imageUrl;
-  final int? brandId;
-  final int? categoryId;
-  final List<Map<String, dynamic>> variants;
-
-  SubmitProductForm({
-    this.productId,
-    required this.name,
-    required this.description,
-    this.imageUrl,
-    this.brandId,
-    this.categoryId,
-    this.variants = const [],
-  });
+  UploadProductImageEvent(this.imageBytes);
 }

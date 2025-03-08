@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
 
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: '/tambah-produk',
+      initialLocation: '/login',
       debugLogDiagnostics: true,
       routes: [
         GoRoute(
@@ -98,7 +98,11 @@ class _MyAppState extends State<MyApp> {
         ),
         GoRoute(
           path: '/tambah-produk',
-          builder: (context, state) => ProductFormScreen(),
+          builder: (context, state) {
+            // The extra data will be null for adding a new product
+            final productData = state.extra as Map<String, dynamic>?;
+            return ProductFormScreen(product: productData);
+          },
         )
       ],
     );
@@ -107,13 +111,17 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final supabase = Supabase.instance.client;
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => LoginBloc()),
         BlocProvider(create: (context) => BrandBloc(BrandService())),
         BlocProvider(create: (context) => CategoryBloc(CategoryService())),
         BlocProvider(create: (context) => BannerBloc(BannerService())),
-        //BlocProvider(create: (context) => ProductBloc(ProductService())),
+        BlocProvider(
+          create: (context) => ProductBloc(ProductService(supabase)),
+        ),
       ],
       child: MaterialApp.router(
         title: 'Admin | GPD',

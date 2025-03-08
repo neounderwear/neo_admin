@@ -35,27 +35,16 @@ class ProductError extends ProductState {
   ProductError(this.message);
 }
 
-// Image Upload States
-class ImageUploadSuccess extends ProductState {
+class ImageUploadLoadingState extends ProductState {}
+
+class ImageUploadSuccessState extends ProductState {
   final String imageUrl;
 
-  ImageUploadSuccess(this.imageUrl);
+  ImageUploadSuccessState(this.imageUrl);
 }
 
-// Variant States
-class VariantRowUpdated extends ProductState {
-  final List<Map<String, dynamic>> variants;
+class ImageUploadErrorState extends ProductState {
+  final String message;
 
-  VariantRowUpdated(this.variants);
-}
-
-// Product Submission States
-class ProductSubmissionSuccess extends ProductState {}
-
-// Detail Product State
-class ProductDetailLoaded extends ProductState {
-  final Map<String, dynamic> product;
-  final List<Map<String, dynamic>> variants;
-
-  ProductDetailLoaded({required this.product, required this.variants});
+  ImageUploadErrorState(this.message);
 }

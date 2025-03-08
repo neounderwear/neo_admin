@@ -77,16 +77,20 @@ class BannerTableWidget extends StatelessWidget {
                   return DataRow(
                     cells: <DataCell>[
                       DataCell(
-                        Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              banner['image_url'],
-                              width: 150,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.broken_image, size: 50);
-                              },
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                banner['image_url'],
+                                width: 150,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.broken_image,
+                                      size: 50);
+                                },
+                              ),
                             ),
                           ),
                         ),

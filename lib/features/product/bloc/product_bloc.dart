@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neo_admin/features/product/bloc/product_event.dart';
 import 'package:neo_admin/features/product/bloc/product_state.dart';
@@ -9,9 +11,13 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   List<Map<String, dynamic>> _brands = [];
   List<Map<String, dynamic>> _categories = [];
 
-  List<Map<String, dynamic>> variantsList = [];
-  String? imageUrl;
-  String? currentImageUrl;
+  Future<String> uploadImage(Uint8List imageBytes) async {
+    try {
+      return await productService.uploadImage('products', imageBytes);
+    } catch (e) {
+      throw Exception('Failed to upload image: ${e.toString()}');
+    }
+  }
 
   ProductBloc(this.productService) : super(ProductInitial()) {
     // Memuat produk
@@ -53,6 +59,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       try {
         await productService.addProduct(
           name: event.name,
+          description: event.description!,
           brandId: event.brandId,
           categoryId: event.categoryId,
           imageUrl: event.imageUrl,
@@ -99,69 +106,16 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }
     });
 
-    //   // Tambah baris varian produk
-    //   on<AddVariantRow>((event, emit) async {
-    //     variantsList.add({
-    //       'name': '',
-    //       'price': 0,
-    //       'reseller_price': 0,
-    //       'sku': '',
-    //       'stock': 0,
-    //       'weight': 0.0,
-    //     });
-    //     emit(VariantRowUpdated(List.from(variantsList)));
-    //   });
-
-    //   // Hapus baris varian produk
-    //   on<RemoveVariantRow>((event, emit) async {
-    //     if (variantsList.isNotEmpty && event.index < variantsList.length) {
-    //       variantsList.removeAt(event.index);
-    //     }
-    //     emit(VariantRowUpdated(List.from(variantsList)));
-    //   });
-
-    //   on<UploadProductImage>((event, emit) async {
-    //     try {
-    //       currentImageUrl = await productService.uploadImage(
-    //           'product-images', event.imageBytes);
-    //       emit(ImageUploadSuccess(currentImageUrl!));
-    //     } catch (e) {
-    //       emit(ProductError(e.toString()));
-    //     }
-    //   });
-
-    //   // Submit Product Form Event
-    //   on<SubmitProductForm>((event, emit) async {
-    //     try {
-    //       // Prepare product data
-    //       final productData = {
-    //         'name': event.name,
-    //         'description': event.description,
-    //         'image_url': event.imageUrl ?? imageUrl,
-    //       };
-
-    //       // Check if it's an update or new product
-    //       if (event.productId != null) {
-    //         // Update existing product
-    //         await productService.updateProductWithVariants(
-    //             event.productId!, productData, event.variants);
-    //       } else {
-    //         // Add new product
-    //         await productService.addProductWithVariants(
-    //             productData, event.variants);
-
-    //         imageUrl = null;
-    //       }
-
-    //       // Reload products
-    //       add(LoadProducts());
-
-    //       // Emit success state
-    //       emit(ProductSubmissionSuccess());
-    //     } catch (e) {
-    //       emit(ProductError(e.toString()));
-    //     }
-    //   });
+    on<UploadProductImageEvent>((event, emit) async {
+      emit(ImageUploadLoadingState());
+      try {
+        final imageUrl =
+            await productService.uploadImage('products', event.imageBytes);
+        emit(ImageUploadSuccessState(imageUrl));
+      } catch (e) {
+        emit(ImageUploadErrorState('Failed to upload image: ${e.toString()}'));
+      }
+    });
   }
 
   List<Map<String, dynamic>> get products => _products;
