@@ -1,12 +1,8 @@
-import 'package:delightful_toast/delight_toast.dart';
-import 'package:delightful_toast/toast/components/toast_card.dart';
-import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
-import 'package:neo_admin/constant/asset_manager.dart';
 import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/bloc/login_state.dart';
 
@@ -50,29 +46,31 @@ class _LoginMobileState extends State<LoginMobile> {
         child: BlocConsumer<LoginBloc, LoginState>(listener: (context, state) {
           if (state is LoginSuccess) {
             context.go('/main/dashboard');
-            DelightToastBar(
-              builder: (context) {
-                return ToastCard(
-                  leading: Image.asset(AssetManager.successIcon),
-                  title: Text('Berhasil Masuk'),
-                  color: Color(0xFFD9C7B3),
-                );
-              },
-              autoDismiss: true,
-              position: DelightSnackbarPosition.top,
-            ).show(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Berhasil masuk',
+                  style: TextStyle(color: Colors.white),
+                ),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.green,
+                width: 300.0,
+              ),
+            );
           } else if (state is LoginFailure) {
-            DelightToastBar(
-              builder: (context) {
-                return ToastCard(
-                  leading: Image.asset(AssetManager.failedIcon),
-                  title: Text(state.message),
-                  color: Color(0xFFD9C7B3),
-                );
-              },
-              autoDismiss: true,
-              position: DelightSnackbarPosition.top,
-            ).show(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.message,
+                  style: TextStyle(color: Colors.white),
+                ),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.red,
+                width: 300.0,
+              ),
+            );
           }
         }, builder: (context, state) {
           return Scaffold(

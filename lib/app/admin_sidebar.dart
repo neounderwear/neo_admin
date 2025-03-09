@@ -1,10 +1,6 @@
-import 'package:delightful_toast/delight_toast.dart';
-import 'package:delightful_toast/toast/components/toast_card.dart';
-import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:neo_admin/constant/asset_manager.dart';
 import 'package:neo_admin/constant/widget/alert_dialog.dart';
 import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/bloc/login_event.dart';
@@ -61,17 +57,18 @@ class AdminSidebar extends StatelessWidget {
                 label: 'Kamu bisa masuk lagi nanti',
                 function: () {
                   context.go('/login');
-                  DelightToastBar(
-                    builder: (context) {
-                      return ToastCard(
-                        leading: Image.asset(AssetManager.successIcon),
-                        title: Text('Berhasil Keluar'),
-                        color: Color(0xFFD9C7B3),
-                      );
-                    },
-                    autoDismiss: true,
-                    position: DelightSnackbarPosition.top,
-                  ).show(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Berhasil logout',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.green,
+                      width: 300.0,
+                    ),
+                  );
                 }),
           );
         }

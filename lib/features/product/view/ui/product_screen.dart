@@ -23,13 +23,6 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   @override
-  void dispose() {
-    searchController.dispose();
-    searchFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
@@ -103,5 +96,12 @@ class _ProductScreenState extends State<ProductScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    searchFocusNode.dispose();
+    super.dispose();
   }
 }

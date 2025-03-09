@@ -1,13 +1,9 @@
-import 'package:delightful_toast/delight_toast.dart';
-import 'package:delightful_toast/toast/components/toast_card.dart';
-import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
-import 'package:neo_admin/constant/asset_manager.dart';
 import 'package:neo_admin/constant/color.dart';
 import 'package:neo_admin/constant/widget/alert_dialog.dart';
 import 'package:neo_admin/features/product/bloc/product_bloc.dart';
@@ -333,19 +329,18 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                                     DeleteProducts(product['id']),
                                   );
                                   Navigator.of(context).pop();
-                                  DelightToastBar(
-                                    builder: (context) {
-                                      return ToastCard(
-                                        leading: Image.asset(
-                                            AssetManager.successIcon),
-                                        title:
-                                            Text('Berhasil menghapus produk'),
-                                        color: Color(0xFFD9C7B3),
-                                      );
-                                    },
-                                    autoDismiss: true,
-                                    position: DelightSnackbarPosition.top,
-                                  ).show(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Berhasil menghapus produk',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      duration: Duration(seconds: 2),
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: Colors.green,
+                                      width: 300.0,
+                                    ),
+                                  );
                                 },
                               ),
                             );

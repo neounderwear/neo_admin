@@ -1,13 +1,8 @@
 import 'dart:typed_data';
-
-import 'package:delightful_toast/delight_toast.dart';
-import 'package:delightful_toast/toast/components/toast_card.dart';
-import 'package:delightful_toast/toast/utils/enums.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:neo_admin/constant/asset_manager.dart';
 import 'package:neo_admin/features/category/bloc/category_bloc.dart';
 import 'package:neo_admin/features/category/bloc/category_event.dart';
 
@@ -48,32 +43,34 @@ class _CategoryFormWidgetState extends State<CategoryFormWidget> {
   // Fungsi untuk mengirim data
   void submit() {
     if (nameController.text.isEmpty) {
-      DelightToastBar(
-        builder: (context) {
-          return ToastCard(
-            leading: Image.asset(AssetManager.warningIcon),
-            title: Text('Nama kategori tidak boleh kosong'),
-            color: Color(0xFFD9C7B3),
-          );
-        },
-        autoDismiss: true,
-        position: DelightSnackbarPosition.top,
-      ).show(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Nama kategori tidak boleh kosong',
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.yellow,
+          width: 300.0,
+        ),
+      );
       return;
     }
 
     if (widget.category == null && imageBytes == null) {
-      DelightToastBar(
-        builder: (context) {
-          return ToastCard(
-            leading: Image.asset(AssetManager.warningIcon),
-            title: Text('Icon kategori tidak boleh kosong'),
-            color: Color(0xFFD9C7B3),
-          );
-        },
-        autoDismiss: true,
-        position: DelightSnackbarPosition.top,
-      ).show(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Ikon kategori tidak boleh kosong',
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.yellow,
+          width: 300.0,
+        ),
+      );
       return;
     }
 
@@ -90,17 +87,18 @@ class _CategoryFormWidgetState extends State<CategoryFormWidget> {
       }
       Navigator.of(context).pop();
     } catch (e) {
-      DelightToastBar(
-        builder: (context) {
-          return ToastCard(
-            leading: Image.asset(AssetManager.failedIcon),
-            title: Text('Error: ${e.toString()}'),
-            color: Color(0xFFD9C7B3),
-          );
-        },
-        autoDismiss: true,
-        position: DelightSnackbarPosition.top,
-      ).show(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error: ${e.toString()}',
+            style: TextStyle(color: Colors.white),
+          ),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+          width: 300.0,
+        ),
+      );
     }
   }
 
@@ -202,21 +200,20 @@ class _CategoryFormWidgetState extends State<CategoryFormWidget> {
                     child: ElevatedButton(
                       onPressed: () {
                         submit();
-                        DelightToastBar(
-                          builder: (context) {
-                            return ToastCard(
-                              leading: Image.asset(AssetManager.successIcon),
-                              title: Text(
-                                widget.category == null
-                                    ? 'Berhasil menambah kategori'
-                                    : 'Berhasil menyimpan',
-                              ),
-                              color: Color(0xFFD9C7B3),
-                            );
-                          },
-                          autoDismiss: true,
-                          position: DelightSnackbarPosition.top,
-                        ).show(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              widget.category == null
+                                  ? 'Berhasil menambah kategori'
+                                  : 'Berhasil menyimpan',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            duration: Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.green,
+                            width: 300.0,
+                          ),
+                        );
                       },
                       child:
                           Text(widget.category == null ? 'Tambah' : 'Simpan'),
