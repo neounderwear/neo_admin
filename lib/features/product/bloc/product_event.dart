@@ -11,7 +11,7 @@ class AddProducts extends ProductEvent {
   final String? description;
   final int brandId;
   final int categoryId;
-  final String imageUrl;
+  final Uint8List imageBytes;
   final List<Map<String, dynamic>> variants;
 
   AddProducts({
@@ -19,7 +19,7 @@ class AddProducts extends ProductEvent {
     this.description,
     required this.brandId,
     required this.categoryId,
-    required this.imageUrl,
+    required this.imageBytes,
     required this.variants,
   });
 }
@@ -30,7 +30,7 @@ class UpdateProducts extends ProductEvent {
   final String? description;
   final int brandId;
   final int categoryId;
-  final String imageUrl;
+  final Uint8List imageBytes;
   final List<Map<String, dynamic>> variants;
   final List<int>? variantsToDelete;
 
@@ -40,7 +40,7 @@ class UpdateProducts extends ProductEvent {
     this.description,
     required this.brandId,
     required this.categoryId,
-    required this.imageUrl,
+    required this.imageBytes,
     required this.variants,
     this.variantsToDelete,
   });

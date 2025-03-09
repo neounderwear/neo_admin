@@ -48,7 +48,7 @@ class _BannerFormWidgetState extends State<BannerFormWidget> {
         SnackBar(
           content: Text(
             'Silakan pilih halaman untuk banner',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.black),
           ),
           duration: Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,

@@ -1,9 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconly/iconly.dart';
 import 'package:neo_admin/constant/widget/form_label.dart';
 
-class ProductVariantWidget extends StatelessWidget {
-  const ProductVariantWidget({super.key});
+class ProductVariantWidget extends StatefulWidget {
+  final List<Map<String, dynamic>> initialVariants;
+  final Function(List<Map<String, dynamic>>) onVariantChanged;
+
+  const ProductVariantWidget({
+    super.key,
+    required this.initialVariants,
+    required this.onVariantChanged,
+  });
+
+  @override
+  State<ProductVariantWidget> createState() => _ProductVariantWidgetState();
+}
+
+class _ProductVariantWidgetState extends State<ProductVariantWidget> {
+  late List<Map<String, dynamic>> variants;
+
+  @override
+  void initState() {
+    super.initState();
+    variants = List.from(widget.initialVariants);
+  }
+
+  void addVariant() {
+    setState(() {
+      variants.add({
+        'name': '',
+        'sku': '',
+        'price': 0,
+        'discount_price': 0,
+        'reseller_price': 0,
+        'stock': 0,
+        'weight': 0,
+      });
+    });
+    widget.onVariantChanged(variants);
+  }
+
+  void removeVariant(int index) {
+    setState(() {
+      variants.removeAt(index);
+    });
+    widget.onVariantChanged(variants);
+  }
+
+  void updateVariant(int index, String key, dynamic value) {
+    setState(() {
+      variants[index][key] = value;
+    });
+    widget.onVariantChanged(variants);
+  }
+
+  bool isSkuUnique(String sku, int currentIndex) {
+    for (int i = 0; i < variants.length; i++) {
+      if (i != currentIndex && variants[i]['sku'] == sku) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,7 +287,7 @@ class ProductVariantWidget extends StatelessWidget {
                             ),
                             SizedBox(width: size.width * 0.01),
                             IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
+                              icon: Icon(IconlyBold.delete, color: Colors.red),
                               onPressed: () => removeVariant(index),
                             ),
                           ],

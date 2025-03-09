@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:neo_admin/constant/widget/form_label.dart';
 
 class ProductImageWidget extends StatefulWidget {
+  final Uint8List? initialImageBytes;
   final String? initialImageUrl;
-  final Function(Uint8List?) onImageSelected;
+  final Function(Uint8List?)? onImageSelected;
 
   const ProductImageWidget({
     super.key,
+    this.initialImageBytes,
     this.initialImageUrl,
-    required this.onImageSelected,
+    this.onImageSelected,
   });
 
   @override
@@ -19,8 +21,15 @@ class ProductImageWidget extends StatefulWidget {
 }
 
 class _ProductImageWidgetState extends State<ProductImageWidget> {
-  String? imageUrl;
   Uint8List? imageBytes;
+  String? imageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    imageBytes = widget.initialImageBytes;
+    imageUrl = widget.initialImageUrl;
+  }
 
   Future<void> pickImage() async {
     final result = await FilePicker.platform
@@ -29,8 +38,9 @@ class _ProductImageWidgetState extends State<ProductImageWidget> {
       setState(() {
         imageBytes = result.files.single.bytes;
       });
-      // Call the callback to notify parent component
-      widget.onImageSelected(imageBytes);
+      if (widget.onImageSelected != null) {
+        widget.onImageSelected!(imageBytes);
+      }
     }
   }
 
@@ -79,17 +89,8 @@ class _ProductImageWidgetState extends State<ProductImageWidget> {
                       child: imageBytes != null
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(12.0),
-                              child: imageBytes != null
-                                  ? Image.memory(imageBytes!, fit: BoxFit.cover)
-                                  : (imageUrl != null && imageUrl!.isNotEmpty)
-                                      ? Image.network(
-                                          imageUrl!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                                  Icon(Icons.error_outline),
-                                        )
-                                      : Icon(Icons.add_photo_alternate_rounded),
+                              child:
+                                  Image.memory(imageBytes!, fit: BoxFit.cover),
                             )
                           : (imageUrl != null && imageUrl!.isNotEmpty)
                               ? ClipRRect(
@@ -97,21 +98,17 @@ class _ProductImageWidgetState extends State<ProductImageWidget> {
                                   child: Image.network(
                                     imageUrl!,
                                     fit: BoxFit.cover,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      }
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                    },
                                     errorBuilder: (context, error, stackTrace) {
-                                      return Center(
-                                        child: Icon(Icons.error_outline),
+                                      return const Center(
+                                        child: Icon(
+                                          Icons.error_outline,
+                                          size: 48.0,
+                                          color: Colors.grey,
+                                        ),
                                       );
                                     },
-                                  ))
+                                  ),
+                                )
                               : const Center(
                                   child: Icon(
                                     Icons.add_photo_alternate_rounded,

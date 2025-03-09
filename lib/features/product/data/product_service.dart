@@ -75,28 +75,32 @@ class ProductService {
 
   // Fungsi untuk mengubah produk di tabel products
   Future<Map<String, dynamic>> updateProduct({
-    required int productId,
+    required int id,
     required String name,
     String? description,
     required int brandId,
     required int categoryId,
-    required String imageUrl,
+    Uint8List? imageBytes,
     required List<Map<String, dynamic>> variants,
   }) async {
     try {
-      await supabase.from('products').update({
+      final Map<String, dynamic> updateData = {
         'name': name,
         'description': description,
         'brand_id': brandId,
         'category_id': categoryId,
-        'image_url': imageUrl,
         'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', productId);
+      };
+      if (imageBytes != null) {
+        final imageUrl = await uploadImage('/products$id', imageBytes);
+        updateData['image_url'] = imageUrl;
+      }
+      await supabase.from('products').update(updateData).eq('id', id);
 
       final existingVariants = await supabase
           .from('product_variants')
           .select('id')
-          .eq('product_id', productId);
+          .eq('product_id', id);
 
       final existingVariantIds = existingVariants.map((v) => v['id']).toList();
       final updatedVariantIds = variants
@@ -128,7 +132,7 @@ class ProductService {
         } else {
           // Membuat varian baru
           await supabase.from('product_variants').insert({
-            'product_id': productId,
+            'product_id': id,
             'name': variant['name'],
             'price': variant['price'],
             'discount_price': variant['discount_price'],
@@ -140,7 +144,7 @@ class ProductService {
         }
       }
 
-      return await fetchProductById(productId);
+      return await fetchProductById(id);
     } catch (e) {
       rethrow;
     }

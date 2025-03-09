@@ -57,12 +57,16 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<AddProducts>((event, emit) async {
       emit(ProductLoading());
       try {
+        final imageUrl = await productService.uploadImage(
+          'product',
+          event.imageBytes,
+        );
         await productService.addProduct(
           name: event.name,
           description: event.description!,
           brandId: event.brandId,
           categoryId: event.categoryId,
-          imageUrl: event.imageUrl,
+          imageUrl: imageUrl,
           variants: event.variants,
         );
         _products = await productService.fetchProducts();
@@ -78,11 +82,11 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(ProductLoading());
       try {
         await productService.updateProduct(
-          productId: event.productId,
+          id: event.productId,
           name: event.name,
           brandId: event.brandId,
           categoryId: event.categoryId,
-          imageUrl: event.imageUrl,
+          imageBytes: event.imageBytes,
           variants: event.variants,
         );
         _products = await productService.fetchProducts();
@@ -106,16 +110,16 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }
     });
 
-    on<UploadProductImageEvent>((event, emit) async {
-      emit(ImageUploadLoadingState());
-      try {
-        final imageUrl =
-            await productService.uploadImage('products', event.imageBytes);
-        emit(ImageUploadSuccessState(imageUrl));
-      } catch (e) {
-        emit(ImageUploadErrorState('Failed to upload image: ${e.toString()}'));
-      }
-    });
+    // on<UploadProductImageEvent>((event, emit) async {
+    //   emit(ImageUploadLoadingState());
+    //   try {
+    //     final imageUrl =
+    //         await productService.uploadImage('products', event.imageBytes);
+    //     emit(ImageUploadSuccessState(imageUrl));
+    //   } catch (e) {
+    //     emit(ImageUploadErrorState('Failed to upload image: ${e.toString()}'));
+    //   }
+    // });
   }
 
   List<Map<String, dynamic>> get products => _products;

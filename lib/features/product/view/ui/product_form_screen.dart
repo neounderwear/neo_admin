@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
-import 'package:neo_admin/constant/widget/form_label.dart';
 import 'package:neo_admin/features/product/bloc/product_bloc.dart';
 import 'package:neo_admin/features/product/bloc/product_event.dart';
 import 'package:neo_admin/features/product/bloc/product_state.dart';
+import 'package:neo_admin/features/product/view/widget/product_button_widget.dart';
 import 'package:neo_admin/features/product/view/widget/product_detail_section.dart';
 import 'package:neo_admin/features/product/view/widget/product_dropdown_widget.dart';
 import 'package:neo_admin/features/product/view/widget/product_image_widget.dart';
+import 'package:neo_admin/features/product/view/widget/product_variant_widget.dart';
 
 // Widget halaman untuk menambah/mengubah produk
 class ProductFormScreen extends StatefulWidget {
@@ -30,6 +30,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int? selectedBrands;
   int? selectedCategories;
   String? imageUrl;
+  Uint8List? imageBytes;
   List<Map<String, dynamic>> variants = [];
 
   // Image handling
@@ -90,42 +91,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     }
   }
 
-  void addVariant() {
+  // Function untuk handle perubahan variant dari ProductVariantWidget
+  void onVariantChanged(List<Map<String, dynamic>> updatedVariants) {
     setState(() {
-      variants.add({
-        'name': '',
-        'sku': '',
-        'price': 0,
-        'discount_price': 0,
-        'reseller_price': 0,
-        'stock': 0,
-        'weight': 0,
-      });
+      variants = updatedVariants;
     });
   }
 
-  void removeVariant(int index) {
-    setState(() {
-      variants.removeAt(index);
-    });
-  }
-
-  void updateVariant(int index, String key, dynamic value) {
-    setState(() {
-      variants[index][key] = value;
-    });
-  }
-
-  bool isSkuUnique(String sku, int currentIndex) {
-    for (int i = 0; i < variants.length; i++) {
-      if (i != currentIndex && variants[i]['sku'] == sku) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  void saveProduct() async {
+  void submit() async {
     if (_formKey.currentState!.validate()) {
       final productBloc = BlocProvider.of<ProductBloc>(context);
 
@@ -146,7 +119,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           SnackBar(
             content: Text(
               'SKU sudah ada',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.black),
             ),
             duration: Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
@@ -201,7 +174,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           description: descController.text.trim(),
           brandId: selectedBrands!,
           categoryId: selectedCategories!,
-          imageUrl: '',
+          imageBytes: imageBytes!,
           variants: variants,
         ));
       } else {
@@ -226,7 +199,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           description: descController.text.isEmpty ? null : descController.text,
           brandId: selectedBrands!,
           categoryId: selectedCategories!,
-          imageUrl: widget.product!['image_url'],
+          imageBytes: imageBytes!,
           variants: variants,
         ));
       }
@@ -308,7 +281,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                               SizedBox(height: size.height * 0.02),
 
                               // Varian produk
-                              
+                              ProductVariantWidget(
+                                initialVariants: variants,
+                                onVariantChanged: onVariantChanged,
+                              ),
                               SizedBox(height: size.height * 0.02),
                             ],
                           ),
@@ -319,12 +295,22 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                           child: Column(
                             children: [
                               // Foto produk
-                              ProductImageWidget(onImageSelected: (bytes) {
-                                setState(() {
-                                  productImageBytes = bytes;
-                                });
-                              }),
+                              ProductImageWidget(
+                                initialImageBytes: imageBytes,
+                                initialImageUrl: widget.product != null
+                                    ? widget.product!['image_url']
+                                    : null,
+                                onImageSelected: (bytes) {
+                                  setState(() {
+                                    productImageBytes = bytes;
+                                    imageBytes =
+                                        bytes; // Update imageBytes juga untuk submit
+                                  });
+                                },
+                              ),
                               SizedBox(height: size.height * 0.02),
+
+                              // Merek dan Kategori produk
                               ProductDropdownWidget(
                                 selectedBrands: selectedBrands,
                                 selectedCategories: selectedCategories,
@@ -351,25 +337,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           },
         ),
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            backgroundColor: Color(0xFFA67A4D),
-            tooltip: 'Simpan produk',
-            onPressed: () {
-              saveProduct();
-            },
-            child: Icon(IconlyBold.upload),
-          ),
-          SizedBox(height: size.height * 0.01),
-          FloatingActionButton(
-            backgroundColor: Color(0xFFA67A4D),
-            tooltip: 'Batal',
-            onPressed: () => context.go('/main/product'),
-            child: Icon(IconlyBold.close_square),
-          ),
-        ],
+      floatingActionButton: ProductButtonWidget(
+        saveButton: () => submit(),
       ),
     );
   }
