@@ -170,9 +170,16 @@ class ProductService {
 
   // Fungsi untuk fetch data merek dari tabel brands
   Future<List<Map<String, dynamic>>> fetchBrands() async {
-    final response =
-        await supabase.from('brands').select('*').order('brand_name');
-    return response;
+    try {
+      final response = await supabase.from('brands').select('*');
+      print(
+          'Raw brand response: $response'); // Debug untuk melihat struktur response
+
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      print('Error fetching brands: $e');
+      rethrow;
+    }
   }
 
   // Fungsi untuk fetch data merek dari tabel brands

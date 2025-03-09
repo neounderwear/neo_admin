@@ -32,8 +32,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     });
 
     // Memuat brand
+    // Perbaikan:
     on<LoadBrands>((event, emit) async {
-      emit(ProductLoading());
       try {
         _brands = await productService.fetchBrands();
         emit(BrandsLoaded(_brands));
@@ -42,9 +42,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }
     });
 
-    // Memuat kategori
     on<LoadCategories>((event, emit) async {
-      emit(ProductLoading());
       try {
         _categories = await productService.fetchCategories();
         emit(CategoriesLoaded(_categories));
@@ -71,7 +69,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         );
         _products = await productService.fetchProducts();
         emit(ProductSuccess('Berhasil mengupload produk'));
-        emit(ProductLoaded(_products));
       } catch (e) {
         emit(ProductError(e.toString()));
       }
@@ -91,7 +88,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         );
         _products = await productService.fetchProducts();
         emit(ProductSuccess('Berhasil memperbarui produk'));
-        emit(ProductLoaded(_products));
       } catch (e) {
         emit(ProductError(e.toString()));
       }
@@ -104,7 +100,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         await productService.deleteProduct(event.productId);
         _products = await productService.fetchProducts();
         emit(ProductSuccess('Berhasil menghapus produk'));
-        emit(ProductLoaded(_products));
       } catch (e) {
         emit(ProductError(e.toString()));
       }

@@ -93,6 +93,12 @@ class _LoginWebState extends State<LoginWeb> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        CircleAvatar(
+                          child: Image.asset(
+                            'assets/images/cv.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                         const Text(
                           'Halo!',
                           style: TextStyle(

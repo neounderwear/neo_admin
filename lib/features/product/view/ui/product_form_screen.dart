@@ -31,7 +31,10 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   int? selectedCategories;
   String? imageUrl;
   Uint8List? imageBytes;
+
   List<Map<String, dynamic>> variants = [];
+  int? _tempBrandId;
+  int? _tempCategoryId;
 
   // Image handling
   Uint8List? productImageBytes;
@@ -51,6 +54,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   void loadDropdownData() {
     final productBloc = BlocProvider.of<ProductBloc>(context);
+
     productBloc.add(LoadBrands());
     productBloc.add(LoadCategories());
   }
@@ -59,8 +63,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (widget.product != null) {
       nameController.text = widget.product!['name'] ?? '';
       descController.text = widget.product!['description'] ?? '';
-      selectedBrands = widget.product!['brand_id'];
-      selectedCategories = widget.product!['category_id'];
 
       if (widget.product!.containsKey('product_variants')) {
         for (var variant in widget.product!['product_variants']) {
@@ -77,17 +79,25 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         }
       }
 
-      selectedBrands = widget.product!['brand_id'] is int
+      // Simpan nilai sementara sebelum divalidasi
+      final tmpBrandId = widget.product!['brand_id'] is int
           ? widget.product!['brand_id']
           : (widget.product!['brand_id'] != null
               ? int.tryParse(widget.product!['brand_id'].toString())
               : null);
 
-      selectedCategories = widget.product!['category_id'] is int
+      final tmpCategoryId = widget.product!['category_id'] is int
           ? widget.product!['category_id']
           : (widget.product!['category_id'] != null
               ? int.tryParse(widget.product!['category_id'].toString())
               : null);
+
+      // Jangan langsung atur selectedBrands dan selectedCategories
+      // Kita akan atur nanti setelah data brands dan categories dimuat
+
+      // Simpan ID ini untuk divalidasi nanti
+      _tempBrandId = tmpBrandId;
+      _tempCategoryId = tmpCategoryId;
     }
   }
 
@@ -98,112 +108,38 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     });
   }
 
-  void submit() async {
-    if (_formKey.currentState!.validate()) {
-      final productBloc = BlocProvider.of<ProductBloc>(context);
+  void submit() {
+    // Versi paling sederhana untuk isolasi masalah
+    print("Submit dipanggil");
 
-      final Set<String> skuSet = {};
-      bool hasDuplicateSku = false;
-
-      for (int i = 0; i < variants.length; i++) {
-        final sku = variants[i]['sku'].toString();
-        if (skuSet.contains(sku)) {
-          hasDuplicateSku = true;
-          break;
-        }
-        skuSet.add(sku);
-      }
-
-      if (hasDuplicateSku) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'SKU sudah ada',
-              style: TextStyle(color: Colors.black),
-            ),
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.yellow,
-            width: 300.0,
-          ),
-        );
-
-        return;
-      }
-
-      if (productImageBytes != null) {
-        try {
-          imageUrl = await productBloc.uploadImage(productImageBytes!);
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Gagal mengupload gambar',
-                style: TextStyle(color: Colors.white),
-              ),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.red,
-              width: 300.0,
-            ),
-          );
-
-          return;
-        }
-      }
-
-      if (widget.product == null) {
-        if (selectedBrands == null || selectedCategories == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Merek dan Kategori harus dipilih',
-                style: TextStyle(color: Colors.white),
-              ),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.yellow,
-              width: 300.0,
-            ),
-          );
-
-          return;
-        }
-        productBloc.add(AddProducts(
-          name: nameController.text,
-          description: descController.text.trim(),
-          brandId: selectedBrands!,
-          categoryId: selectedCategories!,
-          imageBytes: imageBytes!,
-          variants: variants,
-        ));
-      } else {
-        if (selectedBrands == null || selectedCategories == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Merek dan Kategori harus dipilih',
-                style: TextStyle(color: Colors.white),
-              ),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.yellow,
-              width: 300.0,
-            ),
-          );
-          return;
-        }
-        productBloc.add(UpdateProducts(
-          productId: widget.product!['id'],
-          name: nameController.text,
-          description: descController.text.isEmpty ? null : descController.text,
-          brandId: selectedBrands!,
-          categoryId: selectedCategories!,
-          imageBytes: imageBytes!,
-          variants: variants,
-        ));
-      }
+    if (!_formKey.currentState!.validate()) {
+      print("Form tidak valid");
+      return;
     }
+
+    print("Form valid, melanjutkan...");
+
+    // Hanya tambahkan event sederhana untuk memastikan Bloc berfungsi
+    final productBloc = BlocProvider.of<ProductBloc>(context);
+    productBloc.add(LoadProducts()); // Event yang lebih sederhana
+
+    print("Event ditambahkan ke Bloc");
+  }
+
+// Fungsi helper untuk menampilkan snackbar
+  void _showSnackBar(String message, Color bgColor, Color textColor) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(color: textColor),
+        ),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: bgColor,
+        width: 300.0,
+      ),
+    );
   }
 
   @override
@@ -224,6 +160,20 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             setState(() {
               imageUrl = state.imageUrl;
             });
+          } else if (state is BrandsLoaded && _tempBrandId != null) {
+            // Cek apakah brand_id ada dalam daftar brands
+            final brandExists =
+                state.brands.any((brand) => brand['id'] == _tempBrandId);
+            setState(() {
+              selectedBrands = brandExists ? _tempBrandId : null;
+            });
+          } else if (state is CategoriesLoaded && _tempCategoryId != null) {
+            // Cek apakah category_id ada dalam daftar categories
+            final categoryExists = state.categories
+                .any((category) => category['id'] == _tempCategoryId);
+            setState(() {
+              selectedCategories = categoryExists ? _tempCategoryId : null;
+            });
           } else if (state is ProductSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -237,7 +187,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                 width: 300.0,
               ),
             );
-            context.go('/main/product');
+            // Gunakan delay sebelum navigasi untuk menghindari error
+            Future.delayed(Duration(milliseconds: 1500), () {
+              if (mounted) {
+                Navigator.of(context).pop();
+              }
+            });
           } else if (state is ProductError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -338,7 +293,18 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         ),
       ),
       floatingActionButton: ProductButtonWidget(
-        saveButton: () => submit(),
+        saveButton: () {
+          // Bungkus dengan try-catch untuk menangkap exception
+          try {
+            // Jika submit adalah async, pastikan dihandle dengan benar
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) submit();
+            });
+          } catch (e) {
+            print("Error saat submit: $e");
+          }
+        },
+        // ...
       ),
     );
   }

@@ -6,42 +6,53 @@ import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/bloc/login_event.dart';
 import 'package:neo_admin/features/login/bloc/login_state.dart';
 
+// SideBar atau NavigationBar
+// sebagai navigasi antar halaman utama
+// dalam aplikasi
 class AdminSidebar extends StatelessWidget {
-  final Function(String) onItemTapped;
+  final Function(String) _onItemTapped;
 
-  const AdminSidebar({super.key, required this.onItemTapped});
+  const AdminSidebar(
+      {super.key, required dynamic Function(String) onItemTapped})
+      : _onItemTapped = onItemTapped;
 
+  // List menu item untuk navigasi
+  // halaman utama
   final List<Map<String, dynamic>> menuItems = const [
     {
       'title': 'Beranda',
       'icon': Icons.dashboard_rounded,
-      'route': '/main/dashboard'
+      'route': '/main/dashboard',
     },
-    {'title': 'Banner', 'icon': Icons.image_rounded, 'route': '/main/banner'},
+    {
+      'title': 'Banner',
+      'icon': Icons.image_rounded,
+      'route': '/main/banner',
+    },
     {
       'title': 'Kategori',
       'icon': Icons.category_rounded,
-      'route': '/main/category'
+      'route': '/main/category',
     },
     {
       'title': 'Merek',
       'icon': Icons.branding_watermark_rounded,
-      'route': '/main/brand'
+      'route': '/main/brand',
     },
     {
       'title': 'Produk',
       'icon': Icons.inventory_2_rounded,
-      'route': '/main/product'
+      'route': '/main/product',
     },
     {
       'title': 'Pesanan',
       'icon': Icons.shopping_cart_rounded,
-      'route': '/main/order'
+      'route': '/main/order',
     },
     {
       'title': 'Customer',
       'icon': Icons.people_rounded,
-      'route': '/main/customer'
+      'route': '/main/customer',
     },
   ];
 
@@ -102,7 +113,7 @@ class AdminSidebar extends StatelessWidget {
                       ),
                     ),
                     selected: isSelected,
-                    onTap: () => onItemTapped(item['route']),
+                    onTap: () => _onItemTapped(item['route']),
                   );
                 },
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Header atau AppBar utama aplikasi
 class AdminHeader extends StatefulWidget implements PreferredSizeWidget {
   const AdminHeader({super.key});
 
@@ -11,21 +12,14 @@ class AdminHeader extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AdminHeaderState extends State<AdminHeader> {
-  late final TextEditingController searchController;
-  late final FocusNode searchFocusNode;
+  late final TextEditingController _searchController;
+  late final FocusNode _searchFocusNode;
 
   @override
   void initState() {
-    searchController = TextEditingController();
-    searchFocusNode = FocusNode();
+    _searchController = TextEditingController();
+    _searchFocusNode = FocusNode();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    searchFocusNode.dispose();
-    super.dispose();
   }
 
   @override
@@ -43,7 +37,7 @@ class _AdminHeaderState extends State<AdminHeader> {
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
@@ -53,23 +47,18 @@ class _AdminHeaderState extends State<AdminHeader> {
               fontWeight: FontWeight.w600,
             ),
           ),
-
-          // SizedBox(
-          //   width: 700,
-          //   child: TextField(
-          //     controller: searchController,
-          //     focusNode: searchFocusNode,
-          //     autofocus: false,
-          //     decoration: const InputDecoration(
-          //       hintText: 'Cari apa...',
-          //       border: InputBorder.none,
-          //     ),
-          //     style: const TextStyle(color: Colors.black),
-          //   ),
-          // ),
-          CircleAvatar(),
+          CircleAvatar(
+            child: Image.asset('assets/images/cv.png', fit: BoxFit.cover),
+          ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
   }
 }

@@ -4,7 +4,13 @@ import 'package:iconly/iconly.dart';
 
 class ProductButtonWidget extends StatelessWidget {
   final Function saveButton;
-  const ProductButtonWidget({super.key, required this.saveButton});
+  final Function? cancelButton;
+
+  const ProductButtonWidget({
+    super.key,
+    required this.saveButton,
+    this.cancelButton,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,14 @@ class ProductButtonWidget extends StatelessWidget {
         FloatingActionButton(
           backgroundColor: Color(0xFFA67A4D),
           tooltip: 'Batal',
-          onPressed: () => context.go('/main/product'),
+          onPressed: () {
+            if (cancelButton != null) {
+              cancelButton!();
+            } else {
+              // Gunakan Navigator.pop untuk kembali
+              Navigator.of(context).pop();
+            }
+          },
           child: Icon(IconlyBold.close_square),
         ),
       ],
