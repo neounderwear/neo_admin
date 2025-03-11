@@ -32,12 +32,7 @@ class ProductButtonWidget extends StatelessWidget {
           backgroundColor: Color(0xFFA67A4D),
           tooltip: 'Batal',
           onPressed: () {
-            if (cancelButton != null) {
-              cancelButton!();
-            } else {
-              // Gunakan Navigator.pop untuk kembali
-              Navigator.of(context).pop();
-            }
+            context.go('/main/product');
           },
           child: Icon(IconlyBold.close_square),
         ),

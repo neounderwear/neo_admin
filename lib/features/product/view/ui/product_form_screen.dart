@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:neo_admin/features/product/bloc/product_bloc.dart';
 import 'package:neo_admin/features/product/bloc/product_event.dart';
@@ -109,21 +108,73 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   }
 
   void submit() {
-    // Versi paling sederhana untuk isolasi masalah
-    print("Submit dipanggil");
+    // Validasi form sebelum proses
+    if (!_formKey.currentState!.validate()) return;
 
-    if (!_formKey.currentState!.validate()) {
-      print("Form tidak valid");
+    // Periksa duplikat SKU
+    final Set<String> skuSet = {};
+    bool hasDuplicateSku = false;
+
+    for (int i = 0; i < variants.length; i++) {
+      final sku = variants[i]['sku'].toString();
+      if (skuSet.contains(sku)) {
+        hasDuplicateSku = true;
+        break;
+      }
+      skuSet.add(sku);
+    }
+
+    if (hasDuplicateSku) {
+      _showSnackBar('SKU sudah ada', Colors.yellow, Colors.black);
       return;
     }
 
-    print("Form valid, melanjutkan...");
+    // Validasi dropdown
+    if (selectedBrands == null || selectedCategories == null) {
+      _showSnackBar(
+          'Merek dan Kategori harus dipilih', Colors.yellow, Colors.black);
+      return;
+    }
 
-    // Hanya tambahkan event sederhana untuk memastikan Bloc berfungsi
+    // Validasi variants tidak boleh kosong
+    if (variants.isEmpty) {
+      _showSnackBar('Produk harus memiliki minimal 1 varian', Colors.yellow,
+          Colors.black);
+      return;
+    }
+
     final productBloc = BlocProvider.of<ProductBloc>(context);
-    productBloc.add(LoadProducts()); // Event yang lebih sederhana
 
-    print("Event ditambahkan ke Bloc");
+    // Untuk produk baru
+    if (widget.product == null) {
+      // Validasi image harus ada untuk produk baru
+      if (imageBytes == null) {
+        _showSnackBar(
+            'Gambar produk harus diupload', Colors.yellow, Colors.black);
+        return;
+      }
+
+      productBloc.add(AddProducts(
+        name: nameController.text.trim(),
+        description: descController.text.trim(),
+        brandId: selectedBrands!,
+        categoryId: selectedCategories!,
+        imageBytes: imageBytes!,
+        variants: variants,
+      ));
+    }
+    // Untuk update produk
+    else {
+      productBloc.add(UpdateProducts(
+        productId: widget.product!['id'],
+        name: nameController.text.trim(),
+        description: descController.text.trim(),
+        brandId: selectedBrands!,
+        categoryId: selectedCategories!,
+        imageBytes: imageBytes!,
+        variants: variants,
+      ));
+    }
   }
 
 // Fungsi helper untuk menampilkan snackbar

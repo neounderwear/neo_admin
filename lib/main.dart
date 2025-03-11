@@ -138,6 +138,12 @@ class _MyAppState extends State<MyApp> {
         GoRoute(
           path: '/tambah-produk',
           builder: (context, state) {
+            return ProductFormScreen();
+          },
+        ),
+        GoRoute(
+          path: '/edit-produk',
+          builder: (context, state) {
             final productData = state.extra as Map<String, dynamic>?;
             return ProductFormScreen(product: productData);
           },

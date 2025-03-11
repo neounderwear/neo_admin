@@ -12,12 +12,12 @@ class ProductDropdownWidget extends StatefulWidget {
   final Function(int?) onCategoryChanged;
 
   const ProductDropdownWidget({
-    Key? key,
+    super.key,
     this.selectedBrands,
     this.selectedCategories,
     required this.onBrandChanged,
     required this.onCategoryChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<ProductDropdownWidget> createState() => _ProductDropdownWidgetState();

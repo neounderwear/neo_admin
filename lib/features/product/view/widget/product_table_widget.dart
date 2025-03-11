@@ -311,7 +311,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                           onPressed: () {
                             final productData =
                                 Map<String, dynamic>.from(product);
-                            context.go('/tambah-produk', extra: productData);
+                            context.go('/edit-produk', extra: productData);
                           },
                         ),
                         IconButton(
