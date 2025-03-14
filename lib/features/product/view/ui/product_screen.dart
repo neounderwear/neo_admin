@@ -41,7 +41,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       icon: const Icon(Icons.add),
                       label: const Text('Tambah Produk'),
                       onPressed: () {
-                        context.go('/tambah-produk');
+                        context.go('/main/product/tambah-produk');
                       },
                     ),
                   ),

@@ -136,18 +136,31 @@ class _MyAppState extends State<MyApp> {
         ),
         // Rute tambah produk sebagai halaman penuh terpisah
         GoRoute(
-          path: '/tambah-produk',
+          path: '/main/product/tambah-produk',
           builder: (context, state) {
             return ProductFormScreen();
           },
         ),
         GoRoute(
-          path: '/edit-produk',
+          path: '/main/product/edit-produk/:productId',
           builder: (context, state) {
+            final productId = state.pathParameters['productId'];
             final productData = state.extra as Map<String, dynamic>?;
-            return ProductFormScreen(product: productData);
+
+            // Pastikan productData memiliki ID yang sesuai dengan parameter path
+            Map<String, dynamic>? updatedProductData;
+            if (productData != null) {
+              updatedProductData = {...productData};
+              // Update ID jika berbeda dengan parameter path
+              if (productId != null && productId.isNotEmpty) {
+                updatedProductData['id'] =
+                    int.tryParse(productId) ?? productData['id'];
+              }
+            }
+
+            return ProductFormScreen(product: updatedProductData);
           },
-        )
+        ),
       ],
     );
   }

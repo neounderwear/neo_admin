@@ -302,6 +302,8 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                     Center(child: Text(totalStock.toString())),
                   ),
                   DataCell(Center(child: Text('0'))),
+                  // Bagian navigasi di ProductTableWidget yang membutuhkan perbaikan
+
                   DataCell(
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -311,7 +313,27 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                           onPressed: () {
                             final productData =
                                 Map<String, dynamic>.from(product);
-                            context.go('/edit-produk', extra: productData);
+                            // Pastikan ID produk tersedia dan menggunakan format yang tepat
+                            final productId = product['id']?.toString() ?? '';
+
+                            if (productId.isNotEmpty) {
+                              context.go('/main/product/edit-produk/$productId',
+                                  extra: productData);
+                            } else {
+                              // Tampilkan pesan error jika ID produk tidak tersedia
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'ID produk tidak valid',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  duration: Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.red,
+                                  width: 300.0,
+                                ),
+                              );
+                            }
                           },
                         ),
                         IconButton(
@@ -325,22 +347,39 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                                   AlertDialogWarning(
                                 label: 'Produk bakalan dihapus permanen',
                                 function: () {
-                                  BlocProvider.of<ProductBloc>(context).add(
-                                    DeleteProducts(product['id']),
-                                  );
-                                  Navigator.of(context).pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Berhasil menghapus produk',
-                                        style: TextStyle(color: Colors.white),
+                                  // Pastikan ID produk tersedia
+                                  if (product['id'] != null) {
+                                    BlocProvider.of<ProductBloc>(context).add(
+                                      DeleteProducts(product['id']),
+                                    );
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Berhasil menghapus produk',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        duration: Duration(seconds: 2),
+                                        behavior: SnackBarBehavior.floating,
+                                        backgroundColor: Colors.green,
+                                        width: 300.0,
                                       ),
-                                      duration: Duration(seconds: 2),
-                                      behavior: SnackBarBehavior.floating,
-                                      backgroundColor: Colors.green,
-                                      width: 300.0,
-                                    ),
-                                  );
+                                    );
+                                  } else {
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'ID produk tidak valid',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        duration: Duration(seconds: 2),
+                                        behavior: SnackBarBehavior.floating,
+                                        backgroundColor: Colors.red,
+                                        width: 300.0,
+                                      ),
+                                    );
+                                  }
                                 },
                               ),
                             );
@@ -348,7 +387,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                         ),
                       ],
                     ),
-                  ),
+                  )
                 ],
               );
             }).toList(),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
+import 'package:neo_admin/constant/widget/alert_dialog.dart';
 
 class ProductButtonWidget extends StatelessWidget {
   final Function saveButton;
@@ -32,7 +33,15 @@ class ProductButtonWidget extends StatelessWidget {
           backgroundColor: Color(0xFFA67A4D),
           tooltip: 'Batal',
           onPressed: () {
-            context.go('/main/product');
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialogWarning(
+                label: 'Batal edit produk',
+                function: () {
+                  context.go('/main/product');
+                },
+              ),
+            );
           },
           child: Icon(IconlyBold.close_square),
         ),
