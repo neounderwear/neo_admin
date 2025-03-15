@@ -107,73 +107,111 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     });
   }
 
-  void submit() {
-    // Validasi form sebelum proses
-    if (!_formKey.currentState!.validate()) return;
+  void submit() async {
+    if (_formKey.currentState!.validate()) {
+      final productBloc = BlocProvider.of<ProductBloc>(context);
 
-    // Periksa duplikat SKU
-    final Set<String> skuSet = {};
-    bool hasDuplicateSku = false;
+      final Set<String> skuSet = {};
+      bool hasDuplicateSku = false;
 
-    for (int i = 0; i < variants.length; i++) {
-      final sku = variants[i]['sku'].toString();
-      if (skuSet.contains(sku)) {
-        hasDuplicateSku = true;
-        break;
+      for (int i = 0; i < variants.length; i++) {
+        final sku = variants[i]['sku'].toString();
+        if (skuSet.contains(sku)) {
+          hasDuplicateSku = true;
+          break;
+        }
+        skuSet.add(sku);
       }
-      skuSet.add(sku);
-    }
 
-    if (hasDuplicateSku) {
-      _showSnackBar('SKU sudah ada', Colors.yellow, Colors.black);
-      return;
-    }
+      if (hasDuplicateSku) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'SKU sudah ada',
+              style: TextStyle(color: Colors.white),
+            ),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.fixed,
+            backgroundColor: Colors.yellow,
+            // width: 300.0,
+          ),
+        );
 
-    // Validasi dropdown
-    if (selectedBrands == null || selectedCategories == null) {
-      _showSnackBar(
-          'Merek dan Kategori harus dipilih', Colors.yellow, Colors.black);
-      return;
-    }
-
-    // Validasi variants tidak boleh kosong
-    if (variants.isEmpty) {
-      _showSnackBar('Produk harus memiliki minimal 1 varian', Colors.yellow,
-          Colors.black);
-      return;
-    }
-
-    final productBloc = BlocProvider.of<ProductBloc>(context);
-
-    // Untuk produk baru
-    if (widget.product == null) {
-      // Validasi image harus ada untuk produk baru
-      if (imageBytes == null) {
-        _showSnackBar(
-            'Gambar produk harus diupload', Colors.yellow, Colors.black);
         return;
       }
 
-      productBloc.add(AddProducts(
-        name: nameController.text.trim(),
-        description: descController.text.trim(),
-        brandId: selectedBrands!,
-        categoryId: selectedCategories!,
-        imageBytes: imageBytes!,
-        variants: variants,
-      ));
-    }
-    // Untuk update produk
-    else {
-      productBloc.add(UpdateProducts(
-        productId: widget.product!['id'],
-        name: nameController.text.trim(),
-        description: descController.text.trim(),
-        brandId: selectedBrands!,
-        categoryId: selectedCategories!,
-        imageBytes: imageBytes!,
-        variants: variants,
-      ));
+      if (productImageBytes != null) {
+        try {
+          imageUrl = await productBloc.uploadImage(productImageBytes!);
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Gagal mengupload gambar',
+                style: TextStyle(color: Colors.white),
+              ),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.fixed,
+              backgroundColor: Colors.red,
+              // width: 300.0,
+            ),
+          );
+
+          return;
+        }
+      }
+
+      if (widget.product == null) {
+        if (selectedBrands == null || selectedCategories == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Merek dan Kategori harus dipilih',
+                style: TextStyle(color: Colors.white),
+              ),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.fixed,
+              backgroundColor: Colors.yellow,
+              // width: 300.0,
+            ),
+          );
+
+          return;
+        }
+        productBloc.add(AddProducts(
+          name: nameController.text,
+          description: descController.text.trim(),
+          brandId: selectedBrands!,
+          categoryId: selectedCategories!,
+          imageBytes: imageBytes!,
+          variants: variants,
+        ));
+      } else {
+        if (selectedBrands == null || selectedCategories == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Merek dan Kategori harus dipilih',
+                style: TextStyle(color: Colors.white),
+              ),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.fixed,
+              backgroundColor: Colors.yellow,
+              // width: 300.0,
+            ),
+          );
+          return;
+        }
+        productBloc.add(UpdateProducts(
+          productId: widget.product!['id'],
+          name: nameController.text,
+          description: descController.text.isEmpty ? null : descController.text,
+          brandId: selectedBrands!,
+          categoryId: selectedCategories!,
+          imageBytes: imageBytes!,
+          variants: variants,
+        ));
+      }
     }
   }
 
@@ -186,9 +224,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           style: TextStyle(color: textColor),
         ),
         duration: Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
         backgroundColor: bgColor,
-        width: 300.0,
+        // width: 300.0,
       ),
     );
   }
@@ -233,9 +271,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   style: TextStyle(color: Colors.white),
                 ),
                 duration: Duration(seconds: 2),
-                behavior: SnackBarBehavior.floating,
+                behavior: SnackBarBehavior.fixed,
                 backgroundColor: Colors.green,
-                width: 300.0,
+                //width: 300.0,
               ),
             );
             // Gunakan delay sebelum navigasi untuk menghindari error
@@ -252,9 +290,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                   style: TextStyle(color: Colors.white),
                 ),
                 duration: Duration(seconds: 2),
-                behavior: SnackBarBehavior.floating,
+                behavior: SnackBarBehavior.fixed,
                 backgroundColor: Colors.red,
-                width: 300.0,
+                //width: 300.0,
               ),
             );
           }
@@ -345,9 +383,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       ),
       floatingActionButton: ProductButtonWidget(
         saveButton: () {
-          // Bungkus dengan try-catch untuk menangkap exception
           try {
-            // Jika submit adalah async, pastikan dihandle dengan benar
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) submit();
             });

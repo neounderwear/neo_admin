@@ -21,6 +21,7 @@ class ProductButtonWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         FloatingActionButton(
+          heroTag: 'saveProductButton',
           backgroundColor: Color(0xFFA67A4D),
           tooltip: 'Simpan produk',
           onPressed: () {
@@ -30,6 +31,7 @@ class ProductButtonWidget extends StatelessWidget {
         ),
         SizedBox(height: size.height * 0.01),
         FloatingActionButton(
+          heroTag: 'cancelProductButton',
           backgroundColor: Color(0xFFA67A4D),
           tooltip: 'Batal',
           onPressed: () {
