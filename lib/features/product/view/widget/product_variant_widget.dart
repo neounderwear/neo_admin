@@ -19,6 +19,8 @@ class ProductVariantWidget extends StatefulWidget {
 
 class _ProductVariantWidgetState extends State<ProductVariantWidget> {
   late List<Map<String, dynamic>> variants;
+  // Tambahkan map untuk menyimpan TextEditingController
+  final Map<String, Map<String, TextEditingController>> _controllers = {};
 
   @override
   void initState() {
@@ -28,6 +30,57 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
     if (variants.isEmpty) {
       variants.add(_createEmptyVariant());
     }
+
+    // Inisialisasi controllers untuk setiap varian
+    _initializeControllers();
+  }
+
+  void _initializeControllers() {
+    for (int i = 0; i < variants.length; i++) {
+      _createControllersForVariant(i);
+    }
+  }
+
+  void _createControllersForVariant(int index) {
+    if (index < 0 || index >= variants.length) return;
+
+    final variant = variants[index];
+    final String variantId = 'variant_$index';
+
+    _controllers[variantId] = {
+      'name': TextEditingController(text: variant['name']?.toString() ?? ''),
+      'sku': TextEditingController(text: variant['sku']?.toString() ?? ''),
+      'price': TextEditingController(
+        text: variant['price'] == 0 ? '' : variant['price'].toString(),
+      ),
+      'discount_price': TextEditingController(
+        text: variant['discount_price'] == 0
+            ? ''
+            : variant['discount_price'].toString(),
+      ),
+      'reseller_price': TextEditingController(
+        text: variant['reseller_price'] == 0
+            ? ''
+            : variant['reseller_price'].toString(),
+      ),
+      'stock': TextEditingController(
+        text: variant['stock'] == 0 ? '' : variant['stock'].toString(),
+      ),
+      'weight': TextEditingController(
+        text: variant['weight'] == 0 ? '' : variant['weight'].toString(),
+      ),
+    };
+  }
+
+  // Lakukan cleanup controller saat widget dihapus
+  @override
+  void dispose() {
+    _controllers.forEach((key, controllerMap) {
+      controllerMap.forEach((field, controller) {
+        controller.dispose();
+      });
+    });
+    super.dispose();
   }
 
   Map<String, dynamic> _createEmptyVariant() {
@@ -45,17 +98,33 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
   void addVariant() {
     setState(() {
       variants.add(_createEmptyVariant());
+      // Inisialisasi controller untuk varian baru
+      _createControllersForVariant(variants.length - 1);
     });
     widget.onVariantChanged(variants);
   }
 
   void removeVariant(int index) {
     setState(() {
+      // Hapus controller untuk varian yang dihapus
+      final String variantId = 'variant_$index';
+      if (_controllers.containsKey(variantId)) {
+        _controllers[variantId]!.forEach((field, controller) {
+          controller.dispose();
+        });
+        _controllers.remove(variantId);
+      }
+
       variants.removeAt(index);
       // Pastikan selalu ada minimal satu varian
       if (variants.isEmpty) {
         variants.add(_createEmptyVariant());
+        _createControllersForVariant(0);
       }
+
+      // Re-initialize controllers dengan index yang benar
+      _controllers.clear();
+      _initializeControllers();
     });
     widget.onVariantChanged(variants);
   }
@@ -107,7 +176,13 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: variants.length,
               itemBuilder: (context, index) {
-                final variant = variants[index];
+                final String variantId = 'variant_$index';
+
+                // Cek apakah controller sudah ada
+                if (!_controllers.containsKey(variantId)) {
+                  _createControllersForVariant(index);
+                }
+
                 return Card(
                   elevation: 2,
                   margin: const EdgeInsets.only(bottom: 16),
@@ -130,8 +205,9 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
                                 child: TextField(
-                                  controller: TextEditingController(
-                                      text: variant['name']?.toString() ?? ''),
+                                  controller: _controllers[variantId]
+                                          ?['name'] ??
+                                      TextEditingController(),
                                   decoration: const InputDecoration(
                                     labelText: 'Nama Varian',
                                     border: OutlineInputBorder(),
@@ -148,8 +224,8 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
                                 padding: const EdgeInsets.only(
                                     left: 8.0, right: 8.0),
                                 child: TextField(
-                                  controller: TextEditingController(
-                                      text: variant['sku']?.toString() ?? ''),
+                                  controller: _controllers[variantId]?['sku'] ??
+                                      TextEditingController(),
                                   decoration: const InputDecoration(
                                     labelText: 'SKU Produk',
                                     border: OutlineInputBorder(),
@@ -177,11 +253,9 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
                                 child: TextField(
-                                  controller: TextEditingController(
-                                    text: variant['price'] == 0
-                                        ? ''
-                                        : variant['price'].toString(),
-                                  ),
+                                  controller: _controllers[variantId]
+                                          ?['price'] ??
+                                      TextEditingController(),
                                   keyboardType: TextInputType.number,
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly
@@ -205,11 +279,9 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: TextField(
-                                  controller: TextEditingController(
-                                    text: variant['discount_price'] == 0
-                                        ? ''
-                                        : variant['discount_price'].toString(),
-                                  ),
+                                  controller: _controllers[variantId]
+                                          ?['discount_price'] ??
+                                      TextEditingController(),
                                   keyboardType: TextInputType.number,
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly
@@ -232,11 +304,9 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: TextField(
-                                  controller: TextEditingController(
-                                    text: variant['reseller_price'] == 0
-                                        ? ''
-                                        : variant['reseller_price'].toString(),
-                                  ),
+                                  controller: _controllers[variantId]
+                                          ?['reseller_price'] ??
+                                      TextEditingController(),
                                   keyboardType: TextInputType.number,
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly
@@ -266,11 +336,9 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
                                 child: TextField(
-                                  controller: TextEditingController(
-                                    text: variant['stock'] == 0
-                                        ? ''
-                                        : variant['stock'].toString(),
-                                  ),
+                                  controller: _controllers[variantId]
+                                          ?['stock'] ??
+                                      TextEditingController(),
                                   keyboardType: TextInputType.number,
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly
@@ -292,11 +360,9 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: TextField(
-                                  controller: TextEditingController(
-                                    text: variant['weight'] == 0
-                                        ? ''
-                                        : variant['weight'].toString(),
-                                  ),
+                                  controller: _controllers[variantId]
+                                          ?['weight'] ??
+                                      TextEditingController(),
                                   keyboardType: TextInputType.number,
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly

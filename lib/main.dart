@@ -14,7 +14,7 @@ import 'package:neo_admin/features/category/bloc/category_bloc.dart';
 import 'package:neo_admin/features/category/data/category_service.dart';
 import 'package:neo_admin/features/category/view/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
-import 'package:neo_admin/features/dashboard/presentation/ui/dashboard_screen.dart';
+import 'package:neo_admin/features/dashboard/view/ui/dashboard_screen.dart';
 import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/main/login_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
