@@ -23,9 +23,11 @@ import 'package:neo_admin/features/product/data/product_service.dart';
 import 'package:neo_admin/features/product/view/ui/product_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  setUrlStrategy(PathUrlStrategy());
 
   if (kIsWeb) {
     await dotenv.load(fileName: ".env");
