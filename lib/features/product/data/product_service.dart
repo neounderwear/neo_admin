@@ -73,6 +73,22 @@ class ProductService {
     }
   }
 
+  // Fungsi untuk mengupload gambar ke storage product-images
+  // Di ProductService, perbaiki metode uploadImage untuk menerima Uint8List?
+
+  Future<String> uploadImage(String path, Uint8List? fileBytes) async {
+    // Pastikan fileBytes tidak null sebelum menggunakannya
+    if (fileBytes == null) {
+      throw Exception('File bytes tidak boleh null');
+    }
+
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.png';
+    await supabase.storage
+        .from('product-images')
+        .uploadBinary(fileName, fileBytes);
+    return supabase.storage.from('product-images').getPublicUrl(fileName);
+  }
+
   // Fungsi untuk mengubah produk di tabel products
   Future<Map<String, dynamic>> updateProduct({
     required int id,
@@ -80,23 +96,40 @@ class ProductService {
     String? description,
     required int brandId,
     required int categoryId,
-    Uint8List? imageBytes,
+    Uint8List?
+        imageBytes, // Tetap gunakan imageBytes sebagai parameter opsional
+    String?
+        imageUrl, // Tambahkan parameter imageUrl opsional untuk dukungan tambahan
     required List<Map<String, dynamic>> variants,
   }) async {
     try {
       final Map<String, dynamic> updateData = {
         'name': name,
-        'description': description,
         'brand_id': brandId,
         'category_id': categoryId,
         'updated_at': DateTime.now().toIso8601String(),
       };
+
+      // Tambahkan description jika ada
+      if (description != null && description.isNotEmpty) {
+        updateData['description'] = description;
+      }
+
+      // Jika ada bytes gambar baru, upload dan gunakan URL baru
       if (imageBytes != null) {
-        final imageUrl = await uploadImage('/products$id', imageBytes);
+        final newImageUrl = await uploadImage('/products$id', imageBytes);
+        updateData['image_url'] = newImageUrl;
+      }
+      // Jika ada URL gambar yang diberikan langsung, gunakan itu
+      else if (imageUrl != null && imageUrl.isNotEmpty) {
         updateData['image_url'] = imageUrl;
       }
+      // Jika tidak ada imageBytes atau imageUrl, biarkan image_url yang ada di database
+
+      // Lakukan update produk
       await supabase.from('products').update(updateData).eq('id', id);
 
+      // Ambil varian yang ada
       final existingVariants = await supabase
           .from('product_variants')
           .select('id')
@@ -159,25 +192,12 @@ class ProductService {
     await supabase.from('products').delete().eq('id', productId);
   }
 
-  // Fungsi untuk mengupload gambar ke storage product-images
-  Future<String> uploadImage(String path, Uint8List fileBytes) async {
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}.png';
-    await supabase.storage
-        .from('product-images')
-        .uploadBinary(fileName, fileBytes);
-    return supabase.storage.from('product-images').getPublicUrl(fileName);
-  }
-
   // Fungsi untuk fetch data merek dari tabel brands
   Future<List<Map<String, dynamic>>> fetchBrands() async {
     try {
       final response = await supabase.from('brands').select('*');
-      print(
-          'Raw brand response: $response'); // Debug untuk melihat struktur response
-
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      print('Error fetching brands: $e');
       rethrow;
     }
   }

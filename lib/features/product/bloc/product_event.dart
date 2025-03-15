@@ -11,7 +11,8 @@ class AddProducts extends ProductEvent {
   final String? description;
   final int brandId;
   final int categoryId;
-  final Uint8List imageBytes;
+  final Uint8List?
+      imageBytes; // Pastikan property ini didefinisikan dengan benar
   final List<Map<String, dynamic>> variants;
 
   AddProducts({
@@ -19,20 +20,21 @@ class AddProducts extends ProductEvent {
     this.description,
     required this.brandId,
     required this.categoryId,
-    required this.imageBytes,
+    this.imageBytes, // Property opsional untuk image bytes
     required this.variants,
   });
 }
 
+// Event untuk mengupdate produk
 class UpdateProducts extends ProductEvent {
-  final int productId;
+  final dynamic productId;
   final String name;
   final String? description;
   final int brandId;
   final int categoryId;
-  final Uint8List imageBytes;
+  final Uint8List?
+      imageBytes; // Pastikan property ini didefinisikan dengan benar
   final List<Map<String, dynamic>> variants;
-  final List<int>? variantsToDelete;
 
   UpdateProducts({
     required this.productId,
@@ -40,9 +42,8 @@ class UpdateProducts extends ProductEvent {
     this.description,
     required this.brandId,
     required this.categoryId,
-    required this.imageBytes,
+    this.imageBytes, // Property opsional untuk image bytes
     required this.variants,
-    this.variantsToDelete,
   });
 }
 

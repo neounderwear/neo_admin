@@ -32,7 +32,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     });
 
     // Memuat brand
-    // Perbaikan:
     on<LoadBrands>((event, emit) async {
       try {
         _brands = await productService.fetchBrands();
@@ -42,6 +41,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }
     });
 
+    // Memuat kategori
     on<LoadCategories>((event, emit) async {
       try {
         _categories = await productService.fetchCategories();
@@ -52,21 +52,33 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     });
 
     // Menambah produk
+    // Di ProductBloc, perbaiki handler untuk AddProducts
+
+// Menambah produk
     on<AddProducts>((event, emit) async {
       emit(ProductLoading());
       try {
-        final imageUrl = await productService.uploadImage(
-          'product',
-          event.imageBytes,
-        );
+        // Upload gambar hanya jika tersedia
+        String imageUrl = "";
+        if (event.imageBytes != null) {
+          imageUrl = await productService.uploadImage(
+            'product',
+            event
+                .imageBytes!, // Gunakan operator ! untuk mengkonversi ke non-nullable
+          );
+        }
+
+        // Kirim data ke service
         await productService.addProduct(
           name: event.name,
-          description: event.description!,
+          description: event.description ?? '',
           brandId: event.brandId,
           categoryId: event.categoryId,
           imageUrl: imageUrl,
           variants: event.variants,
         );
+
+        // Perbarui data produk
         _products = await productService.fetchProducts();
         emit(ProductSuccess('Berhasil mengupload produk'));
       } catch (e) {
@@ -74,18 +86,31 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }
     });
 
-    // Mengubah produk
+// Mengubah produk
     on<UpdateProducts>((event, emit) async {
       emit(ProductLoading());
       try {
+        // Untuk update product, kita perlu menangani imageBytes dengan benar
+        String? imageUrl;
+        if (event.imageBytes != null) {
+          imageUrl = await productService.uploadImage(
+            'product',
+            event
+                .imageBytes!, // Gunakan operator ! untuk mengkonversi ke non-nullable
+          );
+        }
+
         await productService.updateProduct(
           id: event.productId,
           name: event.name,
+          description: event.description,
           brandId: event.brandId,
           categoryId: event.categoryId,
-          imageBytes: event.imageBytes,
+          imageUrl: imageUrl, // Menggunakan imageUrl alih-alih imageBytes
           variants: event.variants,
         );
+
+        // Perbarui data produk
         _products = await productService.fetchProducts();
         emit(ProductSuccess('Berhasil memperbarui produk'));
       } catch (e) {
@@ -104,17 +129,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(ProductError(e.toString()));
       }
     });
-
-    // on<UploadProductImageEvent>((event, emit) async {
-    //   emit(ImageUploadLoadingState());
-    //   try {
-    //     final imageUrl =
-    //         await productService.uploadImage('products', event.imageBytes);
-    //     emit(ImageUploadSuccessState(imageUrl));
-    //   } catch (e) {
-    //     emit(ImageUploadErrorState('Failed to upload image: ${e.toString()}'));
-    //   }
-    // });
   }
 
   List<Map<String, dynamic>> get products => _products;

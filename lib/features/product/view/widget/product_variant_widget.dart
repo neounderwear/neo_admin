@@ -24,19 +24,27 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
   void initState() {
     super.initState();
     variants = List.from(widget.initialVariants);
+    // Pastikan selalu ada minimal satu varian saat inisialisasi
+    if (variants.isEmpty) {
+      variants.add(_createEmptyVariant());
+    }
+  }
+
+  Map<String, dynamic> _createEmptyVariant() {
+    return {
+      'name': '',
+      'sku': '',
+      'price': 0,
+      'discount_price': 0,
+      'reseller_price': 0,
+      'stock': 0,
+      'weight': 0,
+    };
   }
 
   void addVariant() {
     setState(() {
-      variants.add({
-        'name': '',
-        'sku': '',
-        'price': 0,
-        'discount_price': 0,
-        'reseller_price': 0,
-        'stock': 0,
-        'weight': 0,
-      });
+      variants.add(_createEmptyVariant());
     });
     widget.onVariantChanged(variants);
   }
@@ -44,6 +52,10 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
   void removeVariant(int index) {
     setState(() {
       variants.removeAt(index);
+      // Pastikan selalu ada minimal satu varian
+      if (variants.isEmpty) {
+        variants.add(_createEmptyVariant());
+      }
     });
     widget.onVariantChanged(variants);
   }
@@ -66,8 +78,6 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -82,219 +92,236 @@ class _ProductVariantWidgetState extends State<ProductVariantWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const FormLabel(label: 'Varian Produk'),
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: addVariant,
-                  child: Text('Tambah Varian'),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Tambah Varian'),
                 ),
               ],
             ),
+            const SizedBox(height: 20),
 
             // Variant List
-            variants.isEmpty
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text('Belum ada varian produk'),
-                    ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: variants.length,
-                    itemBuilder: (context, index) {
-                      final variant = variants[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24.0),
-                        child: Row(
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: variants.length,
+              itemBuilder: (context, index) {
+                final variant = variants[index];
+                return Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Row 1: Name and SKU with Delete button
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Name Field
                             Expanded(
-                              child: TextFormField(
-                                initialValue: variant['name'],
-                                decoration: const InputDecoration(
-                                  labelText: 'Nama Varian',
-                                  border: OutlineInputBorder(),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Nama varian wajib diisi';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) =>
-                                    updateVariant(index, 'name', value),
-                              ),
-                            ),
-                            SizedBox(width: size.width * 0.01),
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: variant['sku'],
-                                decoration: InputDecoration(
-                                  labelText: 'SKU Produk',
-                                  border: OutlineInputBorder(),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'SKU wajib diisi';
-                                  }
-                                  if (!isSkuUnique(value, index)) {
-                                    return 'SKU harus unik';
-                                  }
-
-                                  return null;
-                                },
-                                onChanged: (value) => updateVariant(
-                                  index,
-                                  'sku',
-                                  value,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: size.width * 0.01),
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: variant['price'] == 0
-                                    ? ''
-                                    : variant['price'].toString(),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                decoration: InputDecoration(
-                                    labelText: 'Harga',
+                              flex: 1,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: TextField(
+                                  controller: TextEditingController(
+                                      text: variant['name']?.toString() ?? ''),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Nama Varian',
                                     border: OutlineInputBorder(),
-                                    prefixText: 'Rp.'),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Harga jual wajib diisi';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) => updateVariant(
-                                  index,
-                                  'price',
-                                  value.isEmpty ? 0 : int.parse(value),
+                                  ),
+                                  onChanged: (value) =>
+                                      updateVariant(index, 'name', value),
                                 ),
                               ),
                             ),
-                            SizedBox(width: size.width * 0.01),
+                            // SKU Field
                             Expanded(
-                              child: TextFormField(
-                                initialValue: variant['discount_price'] == 0
-                                    ? ''
-                                    : variant['discount_price'].toString(),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                decoration: InputDecoration(
-                                    labelText: 'Harga Diskon',
+                              flex: 1,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 8.0, right: 8.0),
+                                child: TextField(
+                                  controller: TextEditingController(
+                                      text: variant['sku']?.toString() ?? ''),
+                                  decoration: const InputDecoration(
+                                    labelText: 'SKU Produk',
                                     border: OutlineInputBorder(),
-                                    prefixText: 'Rp.'),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Harga diskon wajib diisi';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) => updateVariant(
-                                  index,
-                                  'discount_price',
-                                  value.isEmpty ? 0 : int.parse(value),
+                                  ),
+                                  onChanged: (value) =>
+                                      updateVariant(index, 'sku', value),
                                 ),
                               ),
                             ),
-                            SizedBox(width: size.width * 0.01),
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: variant['reseller_price'] == 0
-                                    ? ''
-                                    : variant['reseller_price'].toString(),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                decoration: InputDecoration(
-                                    labelText: 'Harga Reseller',
-                                    border: OutlineInputBorder(),
-                                    prefixText: 'Rp.'),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Harga reseller wajib diisi';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) => updateVariant(
-                                  index,
-                                  'reseller_price',
-                                  value.isEmpty ? 0 : int.parse(value),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: size.width * 0.01),
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: variant['stock'] == 0
-                                    ? ''
-                                    : variant['stock'].toString(),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                decoration: InputDecoration(
-                                  labelText: 'Stok',
-                                  border: OutlineInputBorder(),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Stok wajib diisi';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) => updateVariant(
-                                  index,
-                                  'stock',
-                                  value.isEmpty ? 0 : int.parse(value),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: size.width * 0.01),
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: variant['weight'] == 0
-                                    ? ''
-                                    : variant['weight'].toString(),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                decoration: InputDecoration(
-                                  labelText: 'Berat (gr)',
-                                  border: OutlineInputBorder(),
-                                  suffixText: 'gr',
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Stok wajib diisi';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) => updateVariant(
-                                  index,
-                                  'weight',
-                                  value.isEmpty ? 0 : int.parse(value),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: size.width * 0.01),
+                            // Delete Button
                             IconButton(
-                              icon: Icon(IconlyBold.delete, color: Colors.red),
+                              icon: const Icon(IconlyBold.delete,
+                                  color: Colors.red),
                               onPressed: () => removeVariant(index),
                             ),
                           ],
                         ),
-                      );
-                    },
-                  )
+                        const SizedBox(height: 16),
+
+                        // Row 2: Prices
+                        Row(
+                          children: [
+                            // Regular Price
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: TextField(
+                                  controller: TextEditingController(
+                                    text: variant['price'] == 0
+                                        ? ''
+                                        : variant['price'].toString(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  decoration: const InputDecoration(
+                                    labelText: 'Harga',
+                                    prefixText: 'Rp.',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  onChanged: (value) => updateVariant(
+                                    index,
+                                    'price',
+                                    value.isEmpty ? 0 : int.parse(value),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Discount Price
+                            Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: TextField(
+                                  controller: TextEditingController(
+                                    text: variant['discount_price'] == 0
+                                        ? ''
+                                        : variant['discount_price'].toString(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  decoration: const InputDecoration(
+                                    labelText: 'Harga Diskon',
+                                    prefixText: 'Rp.',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  onChanged: (value) => updateVariant(
+                                    index,
+                                    'discount_price',
+                                    value.isEmpty ? 0 : int.parse(value),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Reseller Price
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: TextField(
+                                  controller: TextEditingController(
+                                    text: variant['reseller_price'] == 0
+                                        ? ''
+                                        : variant['reseller_price'].toString(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  decoration: const InputDecoration(
+                                    labelText: 'Harga Reseller',
+                                    prefixText: 'Rp.',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  onChanged: (value) => updateVariant(
+                                    index,
+                                    'reseller_price',
+                                    value.isEmpty ? 0 : int.parse(value),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Row 3: Stock and Weight
+                        Row(
+                          children: [
+                            // Stock Field
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: TextField(
+                                  controller: TextEditingController(
+                                    text: variant['stock'] == 0
+                                        ? ''
+                                        : variant['stock'].toString(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  decoration: const InputDecoration(
+                                    labelText: 'Stok',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  onChanged: (value) => updateVariant(
+                                    index,
+                                    'stock',
+                                    value.isEmpty ? 0 : int.parse(value),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Weight Field with suffix
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: TextField(
+                                  controller: TextEditingController(
+                                    text: variant['weight'] == 0
+                                        ? ''
+                                        : variant['weight'].toString(),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  decoration: const InputDecoration(
+                                    labelText: 'Berat',
+                                    suffixText: 'gr',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  onChanged: (value) => updateVariant(
+                                    index,
+                                    'weight',
+                                    value.isEmpty ? 0 : int.parse(value),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

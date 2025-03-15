@@ -26,8 +26,6 @@ class ProductDropdownWidget extends StatefulWidget {
 class _ProductDropdownWidgetState extends State<ProductDropdownWidget> {
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<ProductBloc>(context);
-    print('Current ProductBloc state: ${bloc.state.runtimeType}');
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -60,12 +58,7 @@ class _ProductDropdownWidgetState extends State<ProductDropdownWidget> {
     return BlocConsumer<ProductBloc, ProductState>(
       listenWhen: (previous, current) => current is BrandsLoaded,
       listener: (context, state) {
-        if (state is BrandsLoaded) {
-          print('Brands listener called: ${state.brands.length} brands');
-          // Print seluruh data brand untuk debug
-          print(
-              'Brand data detail: ${state.brands.map((b) => "${b['id']}: ${b['brand_name']}").join(", ")}');
-        }
+        if (state is BrandsLoaded) {}
       },
       buildWhen: (previous, current) => current is BrandsLoaded,
       builder: (context, state) {
@@ -111,12 +104,7 @@ class _ProductDropdownWidgetState extends State<ProductDropdownWidget> {
     return BlocConsumer<ProductBloc, ProductState>(
       listenWhen: (previous, current) => current is CategoriesLoaded,
       listener: (context, state) {
-        if (state is CategoriesLoaded) {
-          print(
-              'Categories listener called: ${state.categories.length} categories');
-          print(
-              'Category data detail: ${state.categories.map((c) => "${c['id']}: ${c['category_name'] ?? c['name']}").join(", ")}');
-        }
+        if (state is CategoriesLoaded) {}
       },
       buildWhen: (previous, current) => current is CategoriesLoaded,
       builder: (context, state) {

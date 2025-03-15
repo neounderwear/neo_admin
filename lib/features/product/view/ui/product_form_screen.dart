@@ -5,13 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:neo_admin/features/product/bloc/product_bloc.dart';
 import 'package:neo_admin/features/product/bloc/product_event.dart';
 import 'package:neo_admin/features/product/bloc/product_state.dart';
-import 'package:neo_admin/features/product/view/widget/product_button_widget.dart';
 import 'package:neo_admin/features/product/view/widget/product_detail_section.dart';
 import 'package:neo_admin/features/product/view/widget/product_dropdown_widget.dart';
 import 'package:neo_admin/features/product/view/widget/product_image_widget.dart';
 import 'package:neo_admin/features/product/view/widget/product_variant_widget.dart';
 
-// Widget halaman untuk menambah/mengubah produk
+// Widget halaman untuk menambah/mengubah produk sebagai modal bottom sheet
 class ProductFormScreen extends StatefulWidget {
   final Map<String, dynamic>? product;
 
@@ -90,11 +89,6 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           : (widget.product!['category_id'] != null
               ? int.tryParse(widget.product!['category_id'].toString())
               : null);
-
-      // Jangan langsung atur selectedBrands dan selectedCategories
-      // Kita akan atur nanti setelah data brands dan categories dimuat
-
-      // Simpan ID ini untuk divalidasi nanti
       _tempBrandId = tmpBrandId;
       _tempCategoryId = tmpCategoryId;
     }
@@ -111,6 +105,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     if (_formKey.currentState!.validate()) {
       final productBloc = BlocProvider.of<ProductBloc>(context);
 
+      // Validasi SKU duplikat
       final Set<String> skuSet = {};
       bool hasDuplicateSku = false;
 
@@ -124,98 +119,56 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
       }
 
       if (hasDuplicateSku) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'SKU sudah ada',
-              style: TextStyle(color: Colors.white),
-            ),
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.fixed,
-            backgroundColor: Colors.yellow,
-            // width: 300.0,
-          ),
-        );
-
+        _showSnackBar('SKU sudah ada', Colors.yellow, Colors.white);
         return;
       }
 
-      if (productImageBytes != null) {
-        try {
-          imageUrl = await productBloc.uploadImage(productImageBytes!);
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Gagal mengupload gambar',
-                style: TextStyle(color: Colors.white),
-              ),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.fixed,
-              backgroundColor: Colors.red,
-              // width: 300.0,
-            ),
-          );
-
-          return;
-        }
+      // Validasi merek dan kategori
+      if (selectedBrands == null || selectedCategories == null) {
+        _showSnackBar(
+            'Merek dan Kategori harus dipilih', Colors.yellow, Colors.white);
+        return;
       }
 
-      if (widget.product == null) {
-        if (selectedBrands == null || selectedCategories == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Merek dan Kategori harus dipilih',
-                style: TextStyle(color: Colors.white),
-              ),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.fixed,
-              backgroundColor: Colors.yellow,
-              // width: 300.0,
-            ),
-          );
+      try {
+        if (widget.product == null) {
+          // Tambah produk baru - gambar wajib ada
+          if (productImageBytes == null) {
+            _showSnackBar(
+                'Gambar produk harus diisi', Colors.yellow, Colors.white);
+            return;
+          }
 
-          return;
+          productBloc.add(AddProducts(
+            name: nameController.text,
+            description: descController.text.trim(),
+            brandId: selectedBrands!,
+            categoryId: selectedCategories!,
+            imageBytes: productImageBytes,
+            variants: variants,
+          ));
+        } else {
+          // Update produk yang ada - gambar opsional
+          productBloc.add(UpdateProducts(
+            productId: widget.product!['id'],
+            name: nameController.text,
+            description:
+                descController.text.isEmpty ? null : descController.text,
+            brandId: selectedBrands!,
+            categoryId: selectedCategories!,
+            imageBytes:
+                productImageBytes, // Null jika tidak ada perubahan gambar
+            variants: variants,
+          ));
         }
-        productBloc.add(AddProducts(
-          name: nameController.text,
-          description: descController.text.trim(),
-          brandId: selectedBrands!,
-          categoryId: selectedCategories!,
-          imageBytes: imageBytes!,
-          variants: variants,
-        ));
-      } else {
-        if (selectedBrands == null || selectedCategories == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Merek dan Kategori harus dipilih',
-                style: TextStyle(color: Colors.white),
-              ),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.fixed,
-              backgroundColor: Colors.yellow,
-              // width: 300.0,
-            ),
-          );
-          return;
-        }
-        productBloc.add(UpdateProducts(
-          productId: widget.product!['id'],
-          name: nameController.text,
-          description: descController.text.isEmpty ? null : descController.text,
-          brandId: selectedBrands!,
-          categoryId: selectedCategories!,
-          imageBytes: imageBytes!,
-          variants: variants,
-        ));
+      } catch (e) {
+        _showSnackBar(
+            'Terjadi kesalahan: ${e.toString()}', Colors.red, Colors.white);
       }
     }
   }
 
-// Fungsi helper untuk menampilkan snackbar
+  // Fungsi helper untuk menampilkan snackbar
   void _showSnackBar(String message, Color bgColor, Color textColor) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -224,9 +177,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           style: TextStyle(color: textColor),
         ),
         duration: Duration(seconds: 2),
-        behavior: SnackBarBehavior.fixed,
+        behavior: SnackBarBehavior.fixed, // Changed from floating to fixed
         backgroundColor: bgColor,
-        // width: 300.0,
       ),
     );
   }
@@ -235,163 +187,201 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.product == null ? 'Buat Produk Baru' : 'Edit Produk',
-          style: TextStyle(fontWeight: FontWeight.w600),
+    return Container(
+      height: size.height * 0.9, // Use 90% of screen height
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16.0),
+          topRight: Radius.circular(16.0),
         ),
-        centerTitle: true,
       ),
-      body: BlocListener<ProductBloc, ProductState>(
-        listener: (context, state) {
-          if (state is ImageUploadSuccessState) {
-            setState(() {
-              imageUrl = state.imageUrl;
-            });
-          } else if (state is BrandsLoaded && _tempBrandId != null) {
-            // Cek apakah brand_id ada dalam daftar brands
-            final brandExists =
-                state.brands.any((brand) => brand['id'] == _tempBrandId);
-            setState(() {
-              selectedBrands = brandExists ? _tempBrandId : null;
-            });
-          } else if (state is CategoriesLoaded && _tempCategoryId != null) {
-            // Cek apakah category_id ada dalam daftar categories
-            final categoryExists = state.categories
-                .any((category) => category['id'] == _tempCategoryId);
-            setState(() {
-              selectedCategories = categoryExists ? _tempCategoryId : null;
-            });
-          } else if (state is ProductSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Berhasil mengupload produk',
-                  style: TextStyle(color: Colors.white),
+      child: Column(
+        children: [
+          // Header with drag handle and title
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 12.0),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey.shade300,
+                  width: 1.0,
                 ),
-                duration: Duration(seconds: 2),
-                behavior: SnackBarBehavior.fixed,
-                backgroundColor: Colors.green,
-                //width: 300.0,
               ),
-            );
-            // Gunakan delay sebelum navigasi untuk menghindari error
-            Future.delayed(Duration(milliseconds: 1500), () {
-              if (mounted) {
-                Navigator.of(context).pop();
-              }
-            });
-          } else if (state is ProductError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Gagal mengupload produk',
-                  style: TextStyle(color: Colors.white),
-                ),
-                duration: Duration(seconds: 2),
-                behavior: SnackBarBehavior.fixed,
-                backgroundColor: Colors.red,
-                //width: 300.0,
-              ),
-            );
-          }
-        },
-        child: BlocBuilder<ProductBloc, ProductState>(
-          builder: (context, state) {
-            if (state is ProductLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            return SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 128.0, vertical: 18.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            children: [
-                              // Nama dan Deskripsi Produk
-                              ProductDetailSection(
-                                nameController: nameController,
-                                descController: descController,
-                              ),
-                              SizedBox(height: size.height * 0.02),
-
-                              // Varian produk
-                              ProductVariantWidget(
-                                initialVariants: variants,
-                                onVariantChanged: onVariantChanged,
-                              ),
-                              SizedBox(height: size.height * 0.02),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: size.width * 0.01),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: [
-                              // Foto produk
-                              ProductImageWidget(
-                                initialImageBytes: imageBytes,
-                                initialImageUrl: widget.product != null
-                                    ? widget.product!['image_url']
-                                    : null,
-                                onImageSelected: (bytes) {
-                                  setState(() {
-                                    productImageBytes = bytes;
-                                    imageBytes =
-                                        bytes; // Update imageBytes juga untuk submit
-                                  });
-                                },
-                              ),
-                              SizedBox(height: size.height * 0.02),
-
-                              // Merek dan Kategori produk
-                              ProductDropdownWidget(
-                                selectedBrands: selectedBrands,
-                                selectedCategories: selectedCategories,
-                                onBrandChanged: (value) {
-                                  setState(() {
-                                    selectedBrands = value;
-                                  });
-                                },
-                                onCategoryChanged: (value) {
-                                  setState(() {
-                                    selectedCategories = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+            ),
+            child: Column(
+              children: [
+                // Drag handle
+                Center(
+                  child: Container(
+                    width: 40.0,
+                    height: 4.0,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(2.0),
                     ),
                   ),
                 ),
+                SizedBox(height: 8.0),
+                // Title
+                Text(
+                  widget.product == null ? 'Buat Produk Baru' : 'Edit Produk',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.0),
+                ),
+              ],
+            ),
+          ),
+          // Main content
+          Expanded(
+            child: BlocListener<ProductBloc, ProductState>(
+              listener: (context, state) {
+                if (state is ImageUploadSuccessState) {
+                  setState(() {
+                    imageUrl = state.imageUrl;
+                  });
+                } else if (state is BrandsLoaded && _tempBrandId != null) {
+                  // Cek apakah brand_id ada dalam daftar brands
+                  final brandExists =
+                      state.brands.any((brand) => brand['id'] == _tempBrandId);
+                  setState(() {
+                    selectedBrands = brandExists ? _tempBrandId : null;
+                  });
+                } else if (state is CategoriesLoaded &&
+                    _tempCategoryId != null) {
+                  // Cek apakah category_id ada dalam daftar categories
+                  final categoryExists = state.categories
+                      .any((category) => category['id'] == _tempCategoryId);
+                  setState(() {
+                    selectedCategories =
+                        categoryExists ? _tempCategoryId : null;
+                  });
+                } else if (state is ProductSuccess) {
+                  _showSnackBar(
+                      'Berhasil mengupload produk', Colors.green, Colors.white);
+                  // Gunakan delay sebelum navigasi untuk menghindari error
+                  Future.delayed(Duration(milliseconds: 1500), () {
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  });
+                } else if (state is ProductError) {
+                  _showSnackBar(
+                      'Gagal mengupload produk', Colors.red, Colors.white);
+                }
+              },
+              child: BlocBuilder<ProductBloc, ProductState>(
+                builder: (context, state) {
+                  if (state is ProductLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 16.0), // Adjusted padding for modal
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Image section at the top for mobile view
+                          Center(
+                            child: ProductImageWidget(
+                              initialImageBytes: imageBytes,
+                              initialImageUrl: widget.product != null
+                                  ? widget.product!['image_url']
+                                  : null,
+                              onImageSelected: (bytes) {
+                                setState(() {
+                                  productImageBytes = bytes;
+                                  imageBytes = bytes;
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(height: size.height * 0.02),
+
+                          // Product details
+                          ProductDetailSection(
+                            nameController: nameController,
+                            descController: descController,
+                          ),
+                          SizedBox(height: size.height * 0.02),
+
+                          // Dropdown for brands and categories
+                          ProductDropdownWidget(
+                            selectedBrands: selectedBrands,
+                            selectedCategories: selectedCategories,
+                            onBrandChanged: (value) {
+                              setState(() {
+                                selectedBrands = value;
+                              });
+                            },
+                            onCategoryChanged: (value) {
+                              setState(() {
+                                selectedCategories = value;
+                              });
+                            },
+                          ),
+                          SizedBox(height: size.height * 0.02),
+
+                          // Variants
+                          ProductVariantWidget(
+                            initialVariants: variants,
+                            onVariantChanged: onVariantChanged,
+                          ),
+                          SizedBox(height: size.height * 0.04),
+
+                          // Action buttons at the bottom
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              // Cancel button
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                icon: Icon(Icons.close),
+                                label: Text('Batal'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey,
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
+                                ),
+                              ),
+
+                              // Save button
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  try {
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      if (mounted) submit();
+                                    });
+                                  } catch (e) {
+                                    rethrow;
+                                  }
+                                },
+                                icon: Icon(Icons.save),
+                                label: Text('Simpan'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFFA67A4D),
+                                  foregroundColor: Colors.white,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
-      floatingActionButton: ProductButtonWidget(
-        saveButton: () {
-          try {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) submit();
-            });
-          } catch (e) {
-            print("Error saat submit: $e");
-          }
-        },
-        // ...
+            ),
+          ),
+        ],
       ),
     );
   }

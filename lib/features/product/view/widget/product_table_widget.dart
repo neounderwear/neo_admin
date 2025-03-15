@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
 import 'package:neo_admin/constant/color.dart';
@@ -13,7 +12,10 @@ import 'package:neo_admin/features/product/bloc/product_state.dart';
 // Widget untuk menampilkan daftar produk
 // dalam bentuk tabel
 class ProductTableWidget extends StatefulWidget {
-  const ProductTableWidget({super.key});
+  // Add callback for editing a product
+  final Function(Map<String, dynamic>)? onEditProduct;
+
+  const ProductTableWidget({super.key, this.onEditProduct});
 
   @override
   State<ProductTableWidget> createState() => _ProductTableWidgetState();
@@ -123,9 +125,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                       try {
                         totalStock += int.parse(variant['stock'].toString());
                       } catch (e) {
-                        // If parsing fails, just add 0
-                        print(
-                            'Could not parse stock value: ${variant['stock']}');
+                        rethrow;
                       }
                     }
                   }
@@ -302,8 +302,7 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                     Center(child: Text(totalStock.toString())),
                   ),
                   DataCell(Center(child: Text('0'))),
-                  // Bagian navigasi di ProductTableWidget yang membutuhkan perbaikan
-
+                  // Modified action cell to use modal instead of navigation
                   DataCell(
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -311,26 +310,22 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                         IconButton(
                           icon: const Icon(IconlyBold.edit, size: 18.0),
                           onPressed: () {
-                            final productData =
-                                Map<String, dynamic>.from(product);
-                            // Pastikan ID produk tersedia dan menggunakan format yang tepat
-                            final productId = product['id']?.toString() ?? '';
-
-                            if (productId.isNotEmpty) {
-                              context.go('/main/product/edit-produk/$productId',
-                                  extra: productData);
+                            // Using the callback to show modal bottom sheet
+                            if (widget.onEditProduct != null) {
+                              final productData =
+                                  Map<String, dynamic>.from(product);
+                              widget.onEditProduct!(productData);
                             } else {
-                              // Tampilkan pesan error jika ID produk tidak tersedia
+                              // Show error if callback is missing
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    'ID produk tidak valid',
+                                    'Tidak dapat mengedit produk',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                   duration: Duration(seconds: 2),
-                                  behavior: SnackBarBehavior.floating,
+                                  behavior: SnackBarBehavior.fixed,
                                   backgroundColor: Colors.red,
-                                  width: 300.0,
                                 ),
                               );
                             }
@@ -360,9 +355,8 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                                           style: TextStyle(color: Colors.white),
                                         ),
                                         duration: Duration(seconds: 2),
-                                        behavior: SnackBarBehavior.floating,
+                                        behavior: SnackBarBehavior.fixed,
                                         backgroundColor: Colors.green,
-                                        width: 300.0,
                                       ),
                                     );
                                   } else {
@@ -374,9 +368,8 @@ class _ProductTableWidgetState extends State<ProductTableWidget> {
                                           style: TextStyle(color: Colors.white),
                                         ),
                                         duration: Duration(seconds: 2),
-                                        behavior: SnackBarBehavior.floating,
+                                        behavior: SnackBarBehavior.fixed,
                                         backgroundColor: Colors.red,
-                                        width: 300.0,
                                       ),
                                     );
                                   }
