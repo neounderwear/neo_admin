@@ -1,0 +1,10 @@
+{
+    "buildCommand": "curl -fsSL https://flutter.io/get-started/install-linux | bash && export PATH=\"$PATH:/root/flutter/bin\" && flutter doctor && flutter config --enable-web && flutter build web",
+    "outputDirectory": "build/web",
+    "rewrites": [
+      {
+        "source": "/(.*)",
+        "destination": "/index.html"
+      }
+    ]
+  }
