@@ -97,7 +97,7 @@ class _LoginWebState extends State<LoginWeb> {
                             backgroundImage:
                                 AssetImage('assets/images/cv.png')),
                         const Text(
-                          'Halo!',
+                          'Holla!',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 24.0,
