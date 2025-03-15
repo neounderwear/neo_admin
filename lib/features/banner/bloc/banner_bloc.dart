@@ -3,6 +3,8 @@ import 'package:neo_admin/features/banner/bloc/banner_event.dart';
 import 'package:neo_admin/features/banner/bloc/banner_state.dart';
 import 'package:neo_admin/features/banner/data/banner_service.dart';
 
+// BLOC State Management
+// untuk fitur Kelola Banner
 class BannerBloc extends Bloc<BannerEvent, BannerState> {
   final BannerService bannerService;
 

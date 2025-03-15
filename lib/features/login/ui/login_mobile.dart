@@ -84,11 +84,7 @@ class _LoginMobileState extends State<LoginMobile> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      child: Image.asset(
-                        'assets/images/cv.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                        backgroundImage: AssetImage('assets/images/cv.png')),
                     const Text(
                       'Halo!',
                       style: TextStyle(

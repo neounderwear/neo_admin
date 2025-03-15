@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Header atau AppBar utama aplikasi
+// Header website
 class AdminHeader extends StatefulWidget implements PreferredSizeWidget {
   const AdminHeader({super.key});
 
@@ -41,15 +41,13 @@ class _AdminHeaderState extends State<AdminHeader> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Admin Gudang Pakaian Dalam',
+            'Gudang Pakaian Dalam',
             style: TextStyle(
               fontSize: 24.0,
               fontWeight: FontWeight.w600,
             ),
           ),
-          CircleAvatar(
-            child: Image.asset('assets/images/cv.png', fit: BoxFit.cover),
-          ),
+          CircleAvatar(backgroundImage: AssetImage('assets/images/cv.png')),
         ],
       ),
     );

@@ -20,7 +20,6 @@ import 'package:neo_admin/features/login/main/login_screen.dart';
 import 'package:neo_admin/features/order/presentation/order_screen.dart';
 import 'package:neo_admin/features/product/bloc/product_bloc.dart';
 import 'package:neo_admin/features/product/data/product_service.dart';
-import 'package:neo_admin/features/product/view/ui/product_form_screen.dart';
 import 'package:neo_admin/features/product/view/ui/product_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -69,7 +68,6 @@ class _MyAppState extends State<MyApp> {
           path: '/login',
           builder: (context, state) => const LoginScreen(),
         ),
-        // Rute utama aplikasi
         GoRoute(
           path: '/main/dashboard',
           pageBuilder: (context, state) => NoTransitionPage(
@@ -88,7 +86,6 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
         ),
-        // Rute lainnya dengan pola yang sama
         GoRoute(
           path: '/main/category',
           pageBuilder: (context, state) => NoTransitionPage(
@@ -133,33 +130,6 @@ class _MyAppState extends State<MyApp> {
               child: const CustomerScreen(),
             ),
           ),
-        ),
-        // Rute tambah produk sebagai halaman penuh terpisah
-        GoRoute(
-          path: '/main/product/tambah-produk',
-          builder: (context, state) {
-            return ProductFormScreen();
-          },
-        ),
-        GoRoute(
-          path: '/main/product/edit-produk/:productId',
-          builder: (context, state) {
-            final productId = state.pathParameters['productId'];
-            final productData = state.extra as Map<String, dynamic>?;
-
-            // Pastikan productData memiliki ID yang sesuai dengan parameter path
-            Map<String, dynamic>? updatedProductData;
-            if (productData != null) {
-              updatedProductData = {...productData};
-              // Update ID jika berbeda dengan parameter path
-              if (productId != null && productId.isNotEmpty) {
-                updatedProductData['id'] =
-                    int.tryParse(productId) ?? productData['id'];
-              }
-            }
-
-            return ProductFormScreen(product: updatedProductData);
-          },
         ),
       ],
     );
