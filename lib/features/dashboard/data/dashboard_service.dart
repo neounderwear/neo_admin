@@ -1,43 +1,37 @@
+import 'package:neo_admin/features/dashboard/data/dashboard_data.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DashboardService {
-  final supabase = Supabase.instance.client;
+  final SupabaseClient supabase;
 
-  // Banner
-  Future<int> fetchBannerCount() async {
+  DashboardService(this.supabase);
+
+  Future<DashboardData> fetchDashboardData() async {
     try {
-      final count = await supabase.from('banners').count();
-      return count;
+      final bannerCount = await _getTableCount('banners');
+      final categoryCount = await _getTableCount('categories');
+      final brandCount = await _getTableCount('brands');
+      final productCount = await _getTableCount('products');
+      final orderCount = await _getTableCount('orders');
+      final customerCount = await _getTableCount('customers');
+
+      return DashboardData(
+        bannerCount: bannerCount,
+        categoryCount: categoryCount,
+        brandCount: brandCount,
+        productCount: productCount,
+        orderCount: orderCount,
+        customerCount: customerCount,
+      );
     } catch (e) {
-      return 0;
+      return DashboardData.empty();
     }
   }
 
-  // Category
-  Future<int> fetchCategoryCount() async {
+  Future<int> _getTableCount(String tableName) async {
     try {
-      final count = await supabase.from('categories').count();
-      return count;
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  // Brand
-  Future<int> fetchBrandCount() async {
-    try {
-      final count = await supabase.from('brands').count();
-      return count;
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  // Product
-  Future<int> fetchProductCount() async {
-    try {
-      final count = await supabase.from('products').count();
-      return count;
+      final response = await supabase.from(tableName).count();
+      return response;
     } catch (e) {
       return 0;
     }

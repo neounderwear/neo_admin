@@ -14,6 +14,8 @@ import 'package:neo_admin/features/category/bloc/category_bloc.dart';
 import 'package:neo_admin/features/category/data/category_service.dart';
 import 'package:neo_admin/features/category/view/ui/category_screen.dart';
 import 'package:neo_admin/features/customer/presentation/customer_screen.dart';
+import 'package:neo_admin/features/dashboard/bloc/dashboard_bloc.dart';
+import 'package:neo_admin/features/dashboard/data/dashboard_service.dart';
 import 'package:neo_admin/features/dashboard/view/ui/dashboard_screen.dart';
 import 'package:neo_admin/features/login/bloc/login_bloc.dart';
 import 'package:neo_admin/features/login/main/login_screen.dart';
@@ -151,6 +153,8 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => ProductBloc(ProductService(supabase)),
         ),
+        BlocProvider(
+            create: (context) => DashboardBloc(DashboardService(supabase)))
       ],
       child: MaterialApp.router(
         title: 'Admin | GPD',
